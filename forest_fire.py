@@ -61,4 +61,16 @@ if __name__ == "__main__":
 	print "vertexes", len(vertexes)
 	print "triangles", len(triangles)
 	print "first point neighbours", neighbours[0]
-	print "plane of 0 vertex has", len(find_plane(0, 0, vertexes, neighbours, plane_map))
+	planes = []
+	for i in range(len(vertexes)):
+		if len(plane_map[i]) == 0:
+			planes += [find_plane(i, len(planes), vertexes, neighbours, plane_map)]
+			print "plane ", len(planes), "starts at", i, "and has", len(planes[-1]), "vertixes"
+
+	hist = {}
+	for s in plane_map:
+		x = len(s)
+		if x in hist:
+			hist[x] += 1
+		else:
+			hixt[x] = 1
