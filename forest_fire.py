@@ -1,17 +1,40 @@
 import obj_io
 import least_squares
+import numpy
+
+eps = 1.0
 
 # plane_map - index to list of planes indexed vectors belong to
 # fill_map - index to boolean if all point neighbours found their plane
 # plane_no - number of plane, basically the count
-def find_plane(i, vertexes, neighbours, plane_map, fill_map, plane_no):
-	plane_indexes = [[i]]
-	for j in neighbours[i]:
-		if fill_map[j] == False:
-			if len(plane_indexes) < 3:
-				plane_indexes += [j]
-			else:
-				
+def find_plane(start_i, plane_no, vertexes, neighbours, plane_map):
+	plane_indexes = [start_i]
+	plane_map[start_i].add(plane_no)
+	plane = [1., 0., 0., 0.]
+	fire = [start_i]
+
+	while len(fire) > 0:
+		new_fire = []
+		for i in fire:
+			for j in neighbours[i]:
+				if not plane_no in plane_map[j]:
+					fits_in_plane = True
+					if len(plane_indexes) >= 3:
+						pts = numpy.array([vertexes[pi] for pi in plane_indexes] + [vertexes[j]])
+						plane = least_squares.fit_plane(pts)
+						distances = least_squares.distances(pts, plane)
+						for d in distances:
+							if abs(d) > eps:
+								fits_in_plane = False
+					if fits_in_plane:
+						plane_indexes += [j]
+						plane_map[j].add(plane_no)
+						if len(plane_map[j]) == 1:
+							new_fire += [j]
+		
+		fire = [i for i in new_fire]
+	return sorted(plane_indexes)
+	
 	
 
 if __name__ == "__main__":
@@ -33,10 +56,9 @@ if __name__ == "__main__":
 		neighbours[t3].add(t1)
 		neighbours[t3].add(t2)
 
-	plane_map = [[] for v in vertexes]
-
-	fill_map = [False for v in vertexes]
+	plane_map = [set() for v in vertexes]
 
 	print "vertexes", len(vertexes)
 	print "triangles", len(triangles)
 	print "first point neighbours", neighbours[0]
+	print "plane of 0 vertex has", len(find_plane(0, 0, vertexes, neighbours, plane_map))
