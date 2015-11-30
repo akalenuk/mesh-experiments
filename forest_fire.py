@@ -74,3 +74,6 @@ if __name__ == "__main__":
 			hist[x] += 1
 		else:
 			hixt[x] = 1
+			
+# reverse plane_map, replace every point in group with group centroid
+# wouldn't work very well for non-convex plane patches, but who's perfect
