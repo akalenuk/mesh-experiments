@@ -22,6 +22,10 @@ def triangles(text):
 	#f 1/x/x 2/x/x 3/x/x
 	return _list_by_prefix('f ', text, lambda s: int(s.split('/')[0]))
 
+def normals(text):
+	#f 1/x/x 2/x/x 3/x/x
+	return _list_by_prefix('f ', text, lambda s: int(s.split('/')[2]))
+
 def str_from_vertexes(vertexes):
 	return _str_by_prefix('v ', vertexes)
 
