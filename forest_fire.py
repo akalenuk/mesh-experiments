@@ -2,7 +2,7 @@ import obj_io
 import least_squares
 import numpy
 
-eps = 1.0
+eps = 2.0
 
 # plane_map - index to list of planes indexed vectors belong to
 # fill_map - index to boolean if all point neighbours found their plane
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 	f = open('ffout.obj', 'w')
 	f.write(obj_io.str_from_vertexes(vertexes))
 	f.write('\n')
-	f.write(obj_io.str_from_faces(triangles))
+	f.write(obj_io.str_from_faces([[ti+1 for ti in tri] for tri in triangles]))
 	f.close()
 # reverse plane_map, replace every point in group with group centroid
 # wouldn't work very well for non-convex plane patches, but who's perfect
