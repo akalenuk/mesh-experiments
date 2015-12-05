@@ -56,7 +56,7 @@ if __name__ == "__main__":
 		neighbours[t3].add(t1)
 		neighbours[t3].add(t2)
 
-	plane_map = [set() for v in vertexes]
+	plane_map = [set() for v in vertexes] # not a map
 
 	print "vertexes", len(vertexes)
 	print "triangles", len(triangles)
@@ -67,13 +67,28 @@ if __name__ == "__main__":
 			planes += [find_plane(i, len(planes), vertexes, neighbours, plane_map)]
 			print "plane ", len(planes), "starts at", i, "and has", len(planes[-1]), "vertixes"
 
-	hist = {}
-	for s in plane_map:
-		x = len(s)
-		if x in hist:
-			hist[x] += 1
+	planes_to_vertexes = {}
+	for (vertex_index, set_of_planes) in zip(range(len(plane_map)), plane_map):
+		list_of_planes = list(set_of_planes)
+		str_of_planes = ' '.join([str(p) for p in list_of_planes])
+		if str_of_planes in planes_to_vertexes:
+			planes_to_vertexes[str_of_planes] += [vertex_index]
 		else:
-			hixt[x] = 1
+			planes_to_vertexes[str_of_planes] = [vertex_index]
+
+	for (_, vertex_indexes)	in planes_to_vertexes.iteritems():
+		div = 1. / len(vertex_indexes)
+		centroid = [0., 0., 0.]
+		for vi in vertex_indexes:
+			centroid = [c+v for (c, v) in zip(centroid, vertexes[vi])]
+		centroid = [c * div for c in centroid]
+		for vi in vertex_indexes:
+			vertexes[vi] = [c for c in centroid]
 			
+	f = open('ffout.obj', 'w')
+	f.write(obj_io.str_from_vertexes(vertexes))
+	f.write('\n')
+	f.write(obj_io.str_from_faces(triangles))
+	f.close()
 # reverse plane_map, replace every point in group with group centroid
 # wouldn't work very well for non-convex plane patches, but who's perfect
