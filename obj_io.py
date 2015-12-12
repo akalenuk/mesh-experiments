@@ -14,18 +14,21 @@ def _str_by_prefix(prefix, elements):
 	return st
 
 
+#v 4,875346 21,185596 0,000000
 def vertexes(text):
-	#v 4,875346 21,185596 0,000000
 	return _list_by_prefix('v ', text)
 
+def normals(text):
+	return _list_by_prefix('vn ', text)
+
+#f 1/x/x 2/x/x 3/x/x
 def triangles(text):
-	#f 1/x/x 2/x/x 3/x/x
 	return _list_by_prefix('f ', text, lambda s: int(s.split('/')[0]))
 
-def normals(text):
-	#f 1/x/x 2/x/x 3/x/x
+def triangle_normals(text):
 	return _list_by_prefix('f ', text, lambda s: int(s.split('/')[2]))
 
+# output
 def str_from_vertexes(vertexes):
 	return _str_by_prefix('v ', vertexes)
 
