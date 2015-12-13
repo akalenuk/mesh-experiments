@@ -7,6 +7,12 @@ def add(A, B):
 def dot(A, B):
 	return sum([ai*bi for (ai, bi) in zip(A, B)])
 
+def length(A):
+	return pow(dot(A, A), 0.5)
+
+def normalize(A):
+	return scale(A, 1.0 / length(A))
+
 def ident(n):
 	return [[1.0 if i==j else 0.0 for j in range(n)] for i in range(n)]
 

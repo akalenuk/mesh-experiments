@@ -1,8 +1,10 @@
 import obj_io
 import least_squares
 import numpy
+import oneliners
 
-eps = 2.0
+EPS = 2.0
+NORM_DOT = 0.9
 
 # plane_map - index to list of planes indexed vectors belong to
 # fill_map - index to boolean if all point neighbours found their plane
@@ -22,10 +24,20 @@ def find_plane(start_i, plane_no, vertexes, neighbours, plane_map):
 					if len(plane_indexes) >= 3:
 						pts = numpy.array([vertexes[pi] for pi in plane_indexes] + [vertexes[j]])
 						plane = least_squares.fit_plane(pts)
-						distances = least_squares.distances(pts, plane)
-						for d in distances:
-							if abs(d) > eps:
-								fits_in_plane = False
+						plane_normal = oneliners.normalize(plane[:3])
+						
+						fits_in_plane = False
+						for n in vertex_normals[pi]:
+							if oneliners.dot(plane_normal, n) >= NORM_DOT:
+								fits_in_plane = True
+								break
+
+						if fits_in_plane:
+							distances = least_squares.distances(pts, plane)
+							for d in distances:
+								if abs(d) > EPS:
+									fits_in_plane = False
+									break
 					if fits_in_plane:
 						plane_indexes += [j]
 						plane_map[j].add(plane_no)
@@ -33,12 +45,19 @@ def find_plane(start_i, plane_no, vertexes, neighbours, plane_map):
 							new_fire += [j]
 		
 		fire = [i for i in new_fire]
+
+	# rollback if fail
+	if len(plane_indexes) == 3:
+		for pi in plane_indexes:
+			plane_map[pi].remove(plane_no)
+		plane_indexes = []
+
 	return sorted(plane_indexes)
 	
 	
 
 if __name__ == "__main__":
-	f = open('ellipsoid.obj', 'r')
+	f = open('cube.obj', 'r')
 	input_obj = f.read()
 	f.close()
 
@@ -55,6 +74,15 @@ if __name__ == "__main__":
 		neighbours[t2].add(t3)
 		neighbours[t3].add(t1)
 		neighbours[t3].add(t2)
+
+	normals = obj_io.normals(input_obj)
+	triangle_normals = obj_io.triangle_normals(input_obj)
+	triangle_normals = [[ti-1 for ti in tis] for tis in triangle_normals]
+	vertex_normals = [[] for every in vertexes]
+	for (tr, tn) in zip(triangles, triangle_normals):
+		for i in range(3):
+			vertex_normals[tr[i]] += [normals[tn[i]]]
+	
 
 	plane_map = [set() for v in vertexes] # not a map
 
