@@ -41,7 +41,7 @@ def ignite(triangle_i, plane_id, plane, plane_map):
 
 
 if __name__ == "__main__":
-	f = open('ellipsoid.obj', 'r')
+	f = open('cube.obj', 'r')
 	input_obj = f.read()
 	f.close()
 
@@ -77,6 +77,7 @@ if __name__ == "__main__":
  		pts = numpy.array([vertexes[pi] for pi in tris] + [vertexes[pi] for pi in tris])
 		plane = least_squares.fit_plane(pts)
 		ignite(i, i, plane, plane_map)
+		break # just one plane for now
 
 
 	# reverse plane_map, replace every point in group with group centroid
