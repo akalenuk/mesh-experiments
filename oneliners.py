@@ -22,11 +22,14 @@ def transpose(A):
 def mul(A, X):
 	return [dot(ai, X) for ai in A]
 
+def vector(P1, P2):
+	return add(scale(P1, -1.), P2)
+
 def project(A, Pn, Pd):
 	return add(A, scale(Pn, (Pd - dot(Pn, A)) / dot(Pn, Pn)))
 
 def distance(A, B):
-	return pow(dot( *(add(A, scale(B, -1.0)), )*2 ), 0.5)
+	return pow(dot( *(vector(A, B), )*2 ), 0.5)
 
 def solve(A, B, Xi):
 	return Xi if distance(mul(A, Xi), B) < 0.0001 else solve(A[1:] + [A[0]], B[1:] + [B[0]], project(Xi, A[0], B[0]))
