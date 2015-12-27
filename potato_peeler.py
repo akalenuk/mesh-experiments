@@ -39,7 +39,7 @@ def peel(triangle_i, plane_id, plane_n, plane_d):
 
 
 if __name__ == "__main__":
-	f = open('cyllinder.obj', 'r')
+	f = open('ellipsoid.obj', 'r')
 	input_obj = f.read()
 	f.close()
 
@@ -70,12 +70,11 @@ if __name__ == "__main__":
 	# wouldn't work very well for non-convex plane patches, but who's perfect
 	planes_to_vertexes = {}
 	for (vertex_index, set_of_planes) in zip(range(len(plane_map)), plane_map):
-		list_of_planes = list(set(set_of_planes))
-		str_of_planes = ' '.join([str(p) for p in list_of_planes])
-		if str_of_planes in planes_to_vertexes:
-			planes_to_vertexes[str_of_planes] += [vertex_index]
+		tuple_of_planes = tuple(set(set_of_planes))
+		if tuple_of_planes in planes_to_vertexes:
+			planes_to_vertexes[tuple_of_planes] += [vertex_index]
 		else:
-			planes_to_vertexes[str_of_planes] = [vertex_index]
+			planes_to_vertexes[tuple_of_planes] = [vertex_index]
 
 	for (a, b) in planes_to_vertexes.iteritems():
 		print a, b
@@ -89,6 +88,9 @@ if __name__ == "__main__":
 			centroid = [c+v for (c, v) in zip(centroid, vertexes[vi])]
 		centroid = [c * div for c in centroid]
 	
+		if len(planes) == 1:
+			print vertex_indexes
+			centroid = [0., 0., 0.]
 		for vi in vertex_indexes:
 			vertexes[vi] = [c for c in centroid]
 			
