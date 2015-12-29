@@ -66,8 +66,8 @@ if __name__ == "__main__":
 		plane_n = normalize(cross)
 		peel(i, i, plane_n, plane_d)
 
-	# reverse plane_map, replace every point in group with group centroid
-	# wouldn't work very well for non-convex plane patches, but who's perfect
+
+	# reverse plane_map
 	planes_to_vertexes = {}
 	for (vertex_index, set_of_planes) in zip(range(len(plane_map)), plane_map):
 		tuple_of_planes = tuple(set(set_of_planes))
@@ -76,23 +76,40 @@ if __name__ == "__main__":
 		else:
 			planes_to_vertexes[tuple_of_planes] = [vertex_index]
 
-	for (a, b) in planes_to_vertexes.iteritems():
-		print a, b
-
+	# 3 step contour retrival
+	# step 1 - get contour points: points of 3+ planes intersection
+	planes_to_contour_point = {}
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
-		if len(planes) == 0:	# debug case, generally there shouldn't be any unplaned vertexes
-			continue
-		centroid = [0., 0., 0.]	
-		div = 1. / len(vertex_indexes)
-		for vi in vertex_indexes:
-			centroid = [c+v for (c, v) in zip(centroid, vertexes[vi])]
-		centroid = [c * div for c in centroid]
-	
+		if len(planes) > 2:
+			centroid = [0., 0., 0.]	
+			div = 1. / len(vertex_indexes)
+			for vi in vertex_indexes:
+				centroid = [c+v for (c, v) in zip(centroid, vertexes[vi])]
+			centroid = [c * div for c in centroid]
+
+			planes_to_contour_point[planes] = centroid
+
+			for vi in vertex_indexes:
+				vertexes[vi] = [xi for xi in centroid]
+
+	# step 2 - merge edge points (where 2 planes intersect) to contour points
+	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
+		if len(planes) == 2:
+			potential_vertexes = []
+			for (cp_planes, vertex) in planes_to_contour_point.iteritems():
+				if planes[0] in cp_planes and planes[1] in cp_planes:
+					potential_vertexes += [vertex]
+
+			for vi in vertex_indexes:
+				potential_vertexes = sorted(potential_vertexes, key = lambda pv: distance(vertexes[vi], pv))
+				vertexes[vi] = [xi for xi in potential_vertexes[0]]
+
+	# step 3 - delete plane points that don't intersect anything (just zero them for now)
+	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
 		if len(planes) == 1:
-			print vertex_indexes
-			centroid = [0., 0., 0.]
-		for vi in vertex_indexes:
-			vertexes[vi] = [c for c in centroid]
+			for vi in vertex_indexes:
+				vertexes[vi] = [0., 0., 0.]
+			
 			
 	f = open('ffout.obj', 'w')
 	f.write(obj_io.str_from_vertexes(vertexes))
