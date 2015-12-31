@@ -37,6 +37,9 @@ def solve(A, B, Xi):
 def invert(A):
 	return transpose([solve(A, ort, [0.0]*len(A)) for ort in ident(len(A))])
 
+def centroid(Ps):
+	return [sum(xi) / len(Ps) for xi in transpose(Ps)]
+
 if __name__ == "__main__":
 	A = [[0.78, -0.42, 0.59], [0.95, 0.31, 0.26], [-0.44, -0.1, -0.38]]
 	B = [1.0, 2.0, 3.0]
@@ -52,3 +55,5 @@ if __name__ == "__main__":
 	X = mul(Ai, B)
 	err = distance(mul(A, X), B)
 	print 'Ai*B, error:', X, err
+	points = [[1., 2., 3.], [2., 4., 6.], [3., 6., 9.]]
+	print 'Centroid of', points, '=', centroid(points)

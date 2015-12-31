@@ -3,45 +3,48 @@ from oneliners import *
 
 EPS = 2.0
 NORM_DOT = 0.9
+INPUT = 'big_ellipsoid.obj'
+OUTPUT = 'ffout.obj'
 
 def peel(triangle_i, plane_id, plane_n, plane_d):
-	global triangle_to_planes, plane_map, triangles, normals, triangle_normals
+	global vertexes, triangles, normals, triangle_normals, vertexes_to_triangles # immutable
+	global vertex_to_planes, triangle_to_planes # mutable
 
-	# burnout check
 	if len(triangle_to_planes[triangle_i]) != 0:
 		return
 
 	# normal check
 	for n in [normals[triangle_normals[triangle_i][j]] for j in range(3)]:
 		if abs(dot(n, plane_n)) < NORM_DOT:
-			print 'n',
 			return
 
-	#distance check
+	# distance check
 	pts = [vertexes[tri] for tri in triangles[triangle_i]]
 	for pt in pts:
 		d = distance(pt, project(pt, plane_n, plane_d))
 		if abs(d) > EPS:
-			print 'd',
 			return
 
 	# mark plane_map
 	for vi in triangles[triangle_i]:
-		plane_map[vi] = list(set(plane_map[vi] + [plane_id]))
+		vertex_to_planes[vi] = list(set(vertex_to_planes[vi] + [plane_id]))
 	triangle_to_planes[triangle_i] += [plane_id]
 
 	# ignite neighbours
-	for new_triangle_i in range(len(triangles)):
-		for i in triangles[new_triangle_i]:
-			if i in triangles[triangle_i]:
-				peel(new_triangle_i, plane_id, plane_n, plane_d)
-				break;
+	for vi in triangles[triangle_i]:
+		for tri in vertexes_to_triangles[vi]:
+			peel(tri, plane_id, plane_n, plane_d)
+
 
 
 if __name__ == "__main__":
-	f = open('ellipsoid.obj', 'r')
+	f = open(INPUT, 'r')
 	input_obj = f.read()
 	f.close()
+
+	print 'Max deviation:', EPS
+	print 'Min dot of normals', NORM_DOT
+	print 'Input model:', INPUT
 
 	vertexes = obj_io.vertexes(input_obj)
 	
@@ -52,8 +55,18 @@ if __name__ == "__main__":
 	triangle_normals = obj_io.triangle_normals(input_obj)
 	triangle_normals = [[ti-1 for ti in tis] for tis in triangle_normals]
 
-	# make plane_map - vertex_index to list of planes it belongs to	
-	plane_map = [[] for every in vertexes]
+	vertexes_to_triangles = {vi : [] for vi in range(len(vertexes))}
+	for ti in range(len(triangles)):
+		vertexes_to_triangles[triangles[ti][0]] += [ti]
+		vertexes_to_triangles[triangles[ti][1]] += [ti]
+		vertexes_to_triangles[triangles[ti][2]] += [ti]
+
+	print '  Vertexes:', len(vertexes)
+	print '  Triangles:', len(triangles)
+
+	# make plane map - vertex_index to list of planes it belongs to	
+	print 'Peeling...',
+	vertex_to_planes = [[] for every in vertexes]
 	triangle_to_planes = [[] for every in triangles]
 	for i in range(len(triangles)):
 		tris = triangles[i]
@@ -65,11 +78,14 @@ if __name__ == "__main__":
 		plane_d = dot(cross, vs[0]) / length(cross)
 		plane_n = normalize(cross)
 		peel(i, i, plane_n, plane_d)
+		if i % 1000 == 0 and i != 0:
+			print 1000,
+	print len(triangles) % 1000 
 
 
 	# reverse plane_map
 	planes_to_vertexes = {}
-	for (vertex_index, set_of_planes) in zip(range(len(plane_map)), plane_map):
+	for (vertex_index, set_of_planes) in zip(range(len(vertex_to_planes)), vertex_to_planes):
 		tuple_of_planes = tuple(set(set_of_planes))
 		if tuple_of_planes in planes_to_vertexes:
 			planes_to_vertexes[tuple_of_planes] += [vertex_index]
@@ -81,16 +97,10 @@ if __name__ == "__main__":
 	planes_to_contour_point = {}
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
 		if len(planes) > 2:
-			centroid = [0., 0., 0.]	
-			div = 1. / len(vertex_indexes)
+			contour_point = centroid([vertexes[vi] for vi in vertex_indexes])
+			planes_to_contour_point[planes] = contour_point
 			for vi in vertex_indexes:
-				centroid = [c+v for (c, v) in zip(centroid, vertexes[vi])]
-			centroid = [c * div for c in centroid]
-
-			planes_to_contour_point[planes] = centroid
-
-			for vi in vertex_indexes:
-				vertexes[vi] = [xi for xi in centroid]
+				vertexes[vi] = [xi for xi in contour_point]
 
 	# step 2 - merge edge points (where 2 planes intersect) to contour points
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
@@ -107,11 +117,15 @@ if __name__ == "__main__":
 	# step 3 - delete plane points that don't intersect anything (just zero them for now)
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
 		if len(planes) == 1:
+			plane_points_centroid = centroid([vertexes[vi] for vi in vertex_indexes])
 			for vi in vertex_indexes:
-				vertexes[vi] = [0., 0., 0.]
+#				vertexes[vi] = [0., 0., 0.]
+				vertexes[vi] = plane_points_centroid
 			
-			
-	f = open('ffout.obj', 'w')
+	print 'Output model:', OUTPUT
+	print '  Contour points:', len(planes_to_contour_point)
+
+	f = open(OUTPUT, 'w')
 	f.write(obj_io.str_from_vertexes(vertexes))
 	f.write('\n')
 	f.write(obj_io.str_from_faces([[ti+1 for ti in tri] for tri in triangles]))
