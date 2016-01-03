@@ -5,6 +5,7 @@ EPS = 2.0
 NORM_DOT = 0.9
 INPUT = 'big_ellipsoid.obj'
 OUTPUT = 'ffout.obj'
+QUASI_RESTORE = True
 
 def peel(triangle_i, plane_id, plane_n, plane_d):
 	global vertexes, triangles, normals, triangle_normals, vertexes_to_triangles # immutable
@@ -15,13 +16,13 @@ def peel(triangle_i, plane_id, plane_n, plane_d):
 
 	# normal check
 	for n in [normals[triangle_normals[triangle_i][j]] for j in range(3)]:
-		if abs(dot(n, plane_n)) < NORM_DOT:
+		if abs(dot_of(n, plane_n)) < NORM_DOT:
 			return
 
 	# distance check
 	pts = [vertexes[tri] for tri in triangles[triangle_i]]
 	for pt in pts:
-		d = distance(pt, project(pt, plane_n, plane_d))
+		d = distance_between(pt, projected_on_plane(pt, plane_n, plane_d))
 		if abs(d) > EPS:
 			return
 
@@ -44,6 +45,7 @@ if __name__ == "__main__":
 
 	print 'Max deviation:', EPS
 	print 'Min dot of normals', NORM_DOT
+	print 'Attempt quasi-restoration:', QUASI_RESTORE
 	print 'Input model:', INPUT
 
 	vertexes = obj_io.vertexes(input_obj)
@@ -75,8 +77,8 @@ if __name__ == "__main__":
 		cross = [v[0][1]*v[1][2] - v[0][2]*v[1][1],
 			 v[0][2]*v[1][0] - v[0][0]*v[1][2],
 			 v[0][0]*v[1][1] - v[0][1]*v[1][0]]
-		plane_d = dot(cross, vs[0]) / length(cross)
-		plane_n = normalize(cross)
+		plane_d = dot_of(cross, vs[0]) / length_of(cross)
+		plane_n = normalized(cross)
 		peel(i, i, plane_n, plane_d)
 		if i % 1000 == 0 and i != 0:
 			print 1000,
@@ -97,7 +99,7 @@ if __name__ == "__main__":
 	planes_to_contour_point = {}
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
 		if len(planes) > 2:
-			contour_point = centroid([vertexes[vi] for vi in vertex_indexes])
+			contour_point = centroid_of([vertexes[vi] for vi in vertex_indexes])
 			planes_to_contour_point[planes] = contour_point
 			for vi in vertex_indexes:
 				vertexes[vi] = [xi for xi in contour_point]
@@ -110,17 +112,20 @@ if __name__ == "__main__":
 				if planes[0] in cp_planes and planes[1] in cp_planes:
 					potential_vertexes += [vertex]
 
+			# it's importrant that this points be merged with nearest contour point
 			for vi in vertex_indexes:
-				potential_vertexes = sorted(potential_vertexes, key = lambda pv: distance(vertexes[vi], pv))
+				potential_vertexes = sorted(potential_vertexes, key = lambda pv: distance_between(vertexes[vi], pv))
 				vertexes[vi] = [xi for xi in potential_vertexes[0]]
 
 	# step 3 - delete plane points that don't intersect anything (just zero them for now)
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
 		if len(planes) == 1:
-			plane_points_centroid = centroid([vertexes[vi] for vi in vertex_indexes])
+			plane_points_centroid = centroid_of([vertexes[vi] for vi in vertex_indexes])
 			for vi in vertex_indexes:
-#				vertexes[vi] = [0., 0., 0.]
-				vertexes[vi] = plane_points_centroid
+				if QUASI_RESTORE:
+					vertexes[vi] = plane_points_centroid
+				else:
+					vertexes[vi] = [0., 0., 0.]
 			
 	print 'Output model:', OUTPUT
 	print '  Contour points:', len(planes_to_contour_point)

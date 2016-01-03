@@ -1,59 +1,62 @@
-def scale(A, x):
+def scaled(A, x):
 	return [ai*x for ai in A]
 
-def add(A, B):
+def sum_of(A, B):
 	return [ai+bi for (ai, bi) in zip(A, B)]
 
-def dot(A, B):
+def dot_of(A, B):
 	return sum([ai*bi for (ai, bi) in zip(A, B)])
 
-def length(A):
-	return pow(dot(A, A), 0.5)
+def length_of(A):
+	return pow(dot_of(A, A), 0.5)
 
-def normalize(A):
-	return scale(A, 1.0 / length(A))
+def normalized(A):
+	return scaled(A, 1.0 / length_of(A))
 
-def ident(n):
+def identity_dim(n):
 	return [[1.0 if i==j else 0.0 for j in range(n)] for i in range(n)]
 
-def transpose(A):
+def transposed(A):
 	return [list(aj) for aj in zip(*A)]
 
-def mul(A, X):
-	return [dot(ai, X) for ai in A]
+def multiplication_of(A, X):
+	return [dot_of(ai, X) for ai in A]
 
 def vector(P1, P2):
-	return add(scale(P1, -1.), P2)
+	return sum_of(scaled(P1, -1.), P2)
 
-def project(A, Pn, Pd):
-	return add(A, scale(Pn, (Pd - dot(Pn, A)) / dot(Pn, Pn)))
+def projected_on_plane(A, Pn, Pd):
+	return sum_of(A, scaled(Pn, (Pd - dot_of(Pn, A)) / dot_of(Pn, Pn)))
 
-def distance(A, B):
-	return pow(dot( *(vector(A, B), )*2 ), 0.5)
+def distance_between(A, B):
+	return pow(dot_of( *(vector(A, B), )*2 ), 0.5)
 
-def solve(A, B, Xi):
-	return Xi if distance(mul(A, Xi), B) < 0.0001 else solve(A[1:] + [A[0]], B[1:] + [B[0]], project(Xi, A[0], B[0]))
+def solution_for(A, B):
+	return solution_iteration(A, B, [0. for bi in B])
 
-def invert(A):
-	return transpose([solve(A, ort, [0.0]*len(A)) for ort in ident(len(A))])
+def solution_iteration(A, B, Xi):
+	return Xi if distance_between(multiplication_of(A, Xi), B) < 0.0001 else solution_iteration(A[1:] + [A[0]], B[1:] + [B[0]], projected_on_plane(Xi, A[0], B[0]))
 
-def centroid(Ps):
-	return [sum(xi) / len(Ps) for xi in transpose(Ps)]
+def inverted(A):
+	return transposed([solution_for(A, ort) for ort in identity_dim(len(A))])
+
+def centroid_of(Ps):
+	return [sum(xi) / len(Ps) for xi in transposed(Ps)]
 
 if __name__ == "__main__":
 	A = [[0.78, -0.42, 0.59], [0.95, 0.31, 0.26], [-0.44, -0.1, -0.38]]
 	B = [1.0, 2.0, 3.0]
 	print 'A, B:', A, B
-	X = solve(A, B, [0.0]*3)
-	err = distance(mul(A, X), B)
+	X = solution_for(A, B)
+	err = distance_between(multiplication_of(A, X), B)
 	print 'X, error:', X, err
-	Ai = invert(A)
+	Ai = inverted(A)
 	print 'A^-1:', Ai
-	Aii = invert(Ai)
+	Aii = inverted(Ai)
 	print '(A^-1)^-1:',Aii
 	print B
-	X = mul(Ai, B)
-	err = distance(mul(A, X), B)
+	X = multiplication_of(Ai, B)
+	err = distance_between(multiplication_of(A, X), B)
 	print 'Ai*B, error:', X, err
 	points = [[1., 2., 3.], [2., 4., 6.], [3., 6., 9.]]
-	print 'Centroid of', points, '=', centroid(points)
+	print 'Centroid of', points, '=', centroid_of(points)
