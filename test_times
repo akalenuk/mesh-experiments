@@ -1,0 +1,36 @@
+Max deviation: 2.0
+Min dot of normals 0.9
+Attempt quasi-restoration: True
+Input model: big_ellipsoid.obj
+  Vertexes: 10242
+  Triangles: 20480
+Peeling... 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000 480
+Peeling time -  1.581868
+Classification and post-processing time -  0.063306
+Output model: ffout.obj
+  Contour points: 101
+
+Max deviation: 2.0
+Min dot of normals 0.9
+Attempt quasi-restoration: True
+Input model: mid_ellipsoid.obj
+  Vertexes: 2562
+  Triangles: 5120
+Peeling... 1000 1000 1000 1000 1000 120
+Peeling time -  0.447225
+Classification and post-processing time -  0.023189
+Output model: ffout.obj
+  Contour points: 135
+
+Max deviation: 2.0
+Min dot of normals 0.9
+Attempt quasi-restoration: True
+Input model: min_ellipsoid.obj
+  Vertexes: 642
+  Triangles: 1280
+Peeling... 1000 280
+Peeling time -  0.135471
+Classification and post-processing time -  0.010744
+Output model: ffout.obj
+  Contour points: 134
+

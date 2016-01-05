@@ -1,3 +1,4 @@
+import time
 import obj_io
 from oneliners import *
 
@@ -68,6 +69,7 @@ if __name__ == "__main__":
 
 	# make plane map - vertex_index to list of planes it belongs to	
 	print 'Peeling...',
+	timestamp = time.clock()
 	vertex_to_planes = [[] for every in vertexes]
 	triangle_to_planes = [[] for every in triangles]
 	for i in range(len(triangles)):
@@ -83,7 +85,8 @@ if __name__ == "__main__":
 		if i % 1000 == 0 and i != 0:
 			print 1000,
 	print len(triangles) % 1000 
-
+	print 'Peeling time - ', time.clock() - timestamp
+	timestamp = time.clock()
 
 	# reverse plane_map
 	planes_to_vertexes = {}
@@ -126,6 +129,7 @@ if __name__ == "__main__":
 					vertexes[vi] = plane_points_centroid
 				else:
 					vertexes[vi] = [0., 0., 0.]
+	print 'Classification and post-processing time - ', time.clock() - timestamp
 			
 	print 'Output model:', OUTPUT
 	print '  Contour points:', len(planes_to_contour_point)
