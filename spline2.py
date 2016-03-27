@@ -1,7 +1,9 @@
 import oneliners
+import html_bitmap
 
-polyline = [(0.,0.), (1.,1.), (2.,2.), (3.,2.), (4.,1.), (5.,0.)]
+polyline = [(0.,0.), (1., 0.), (1.,1.), (2., 1.), (2.,2.), (3.,2.), (4., 2.), (4.,1.), (5., 1.), (5.,2.), (5., 3.), (4., 3.), (4., 4.), (3., 4.), (2., 4.), (2., 5.), (1., 5.), (1., 4.)]
 MAX_AXIS_DIFF = 0.5
+DETAIL_MULTIPLIER = 3
 
 def spline2(d1, p1, p2):
 	return [(p1[i], d1[i], p2[i] - p1[i] - d1[i]) for i in range(2)]
@@ -34,9 +36,18 @@ def approximate(d1, points):
 	for i in range(len(points)-1, 0, -1):
 		spline = spline2(d1, points[0], points[i])
 		if evaluate_spline2(spline, points[:i+1]):
-			new_points = [spline2_point(spline, float(j) / i) for j in range(i)]
+			new_points = [spline2_point(spline, float(j) / i / DETAIL_MULTIPLIER) for j in range(i*DETAIL_MULTIPLIER)]
 			new_d = oneliners.normalized(spline2_d(spline, 1.))
 			return new_points + approximate(new_d, points[i:])	
 	
 
-print approximate((0., 0.), polyline)
+new_polyline = approximate((0., 0.), polyline)
+print new_polyline
+bitmap = html_bitmap.new_bitmap(501, 501)
+for (pl, col) in [(polyline, '#ff0000'), (new_polyline, '#00ff00')]:
+	for (p1, p2) in zip(pl, pl[1:]):
+		html_bitmap.line_on(bitmap, 100*p1[0], 100*p1[1], 100*p2[0], 100*p2[1], col)
+f = open('spline2.html', 'w')
+f.write(html_bitmap.to_html(bitmap))
+f.close()
+		
