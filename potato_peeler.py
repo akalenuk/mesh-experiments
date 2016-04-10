@@ -32,7 +32,7 @@ def peel(triangle_i, plane_id, plane_n, plane_d):
 		vertex_to_planes[vi] = list(set(vertex_to_planes[vi] + [plane_id]))
 	triangle_to_planes[triangle_i] += [plane_id]
 
-	# ignite neighbours
+	# peel neighbours
 	for vi in triangles[triangle_i]:
 		for tri in vertexes_to_triangles[vi]:
 			peel(tri, plane_id, plane_n, plane_d)
@@ -107,28 +107,18 @@ if __name__ == "__main__":
 			for vi in vertex_indexes:
 				vertexes[vi] = [xi for xi in contour_point]
 
-	# step 2 - merge edge points (where 2 planes intersect) to contour points
+	# step 2 - merge edge and plane points (where 2 planes intersect, or all points are on plane) to contour points
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
-		if len(planes) == 2:
+		if len(planes) < 3:
 			potential_vertexes = []
 			for (cp_planes, vertex) in planes_to_contour_point.iteritems():
-				if planes[0] in cp_planes and planes[1] in cp_planes:
-					potential_vertexes += [vertex]
+				potential_vertexes += [vertex]
 
 			# it's importrant that this points be merged with nearest contour point
 			for vi in vertex_indexes:
 				potential_vertexes = sorted(potential_vertexes, key = lambda pv: distance_between(vertexes[vi], pv))
 				vertexes[vi] = [xi for xi in potential_vertexes[0]]
 
-	# step 3 - delete plane points that don't intersect anything (just zero them for now)
-	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
-		if len(planes) == 1:
-			plane_points_centroid = centroid_of([vertexes[vi] for vi in vertex_indexes])
-			for vi in vertex_indexes:
-				if QUASI_RESTORE:
-					vertexes[vi] = plane_points_centroid
-				else:
-					vertexes[vi] = [0., 0., 0.]
 	print 'Classification and post-processing time - ', time.clock() - timestamp
 			
 	print 'Output model:', OUTPUT
