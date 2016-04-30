@@ -6,7 +6,6 @@ EPS = 2.0
 NORM_DOT = 0.9
 INPUT = 'big_ellipsoid.obj'
 OUTPUT = 'ffout.obj'
-QUASI_RESTORE = True
 
 def peel(triangle_i, plane_id, plane_n, plane_d):
 	global vertexes, triangles, normals, triangle_normals, vertexes_to_triangles # immutable
@@ -46,7 +45,6 @@ if __name__ == "__main__":
 
 	print 'Max deviation:', EPS
 	print 'Min dot of normals', NORM_DOT
-	print 'Attempt quasi-restoration:', QUASI_RESTORE
 	print 'Input model:', INPUT
 
 	vertexes = obj_io.vertexes(input_obj)
