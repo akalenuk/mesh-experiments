@@ -97,7 +97,7 @@ if __name__ == "__main__":
 		else:
 			planes_to_vertexes[tuple_of_planes] = [vertex_index]
 
-	# 3 step contour retrival
+	# contour retrival
 	# step 1 - get contour points: points of 3+ planes intersection
 	planes_to_contour_point = {}
 	for (planes, vertex_indexes) in planes_to_vertexes.iteritems():
@@ -112,6 +112,8 @@ if __name__ == "__main__":
 		if len(planes) < 3:
 			potential_vertexes = []
 			for (cp_planes, vertex) in planes_to_contour_point.iteritems():
+				if planes[0] in cp_planes and (len(planes) > 1 and planes[1] in cp_planes):
+					potential_vertexes += [vertex]
 				potential_vertexes += [vertex]
 
 			# it's importrant that this points be merged with nearest contour point
@@ -129,3 +131,4 @@ if __name__ == "__main__":
 	f.write('\n')
 	f.write(obj_io.str_from_faces([[ti+1 for ti in tri] for tri in triangles]))
 	f.close()
+
