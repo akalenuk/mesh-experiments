@@ -118,8 +118,8 @@ if __name__ == "__main__":
 
 			# it's importrant that this points be merged with nearest contour point
 			for vi in vertex_indexes:
-				potential_vertexes = sorted(potential_vertexes, key = lambda pv: distance_between(vertexes[vi], pv))
-				vertexes[vi] = [xi for xi in potential_vertexes[0]]
+				nearest_contour_vertex = min(potential_vertexes, key = lambda pv: distance_between(vertexes[vi], pv))
+				vertexes[vi] = [xi for xi in nearest_contour_vertex]
 
 	print 'Classification and post-processing time - ', time.clock() - timestamp
 			
