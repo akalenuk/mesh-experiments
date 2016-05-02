@@ -110,7 +110,7 @@ if __name__ == "__main__":
 		if len(planes) < 3:
 			potential_vertexes = []
 			for (cp_planes, vertex) in planes_to_contour_point.iteritems():
-				if planes[0] in cp_planes and (len(planes) > 1 and planes[1] in cp_planes):
+				if planes[0] in cp_planes and (len(planes) == 1 or planes[1] in cp_planes):
 					potential_vertexes += [vertex]
 				potential_vertexes += [vertex]
 
