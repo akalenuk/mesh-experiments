@@ -4,9 +4,8 @@ import least_squares
 import numpy
 from oneliners import *
 
-EPS = 2.0
-NORM_DOT = 0.9
-INPUT = 'big_ellipsoid.obj'
+EPS = 0.02
+INPUT = 'cube.obj'
 OUTPUT = 'ffout.obj'
 
 def find_plane(start_i, plane_no, vertexes, neighbours, plane_map):
@@ -28,11 +27,20 @@ def find_plane(start_i, plane_no, vertexes, neighbours, plane_map):
 						for d in distances:
 							if abs(d) > EPS:
 								fits_in_plane = False
+
+					# does it even work?
+					if len(plane_indexes) == 2:
+						v1 = vector(vertexes[j], vertexes[plane_indexes[0]]) 
+						v2 = vector(vertexes[j], vertexes[plane_indexes[1]]) 
+						if length_of(v1) < EPS or length_of(v2) < EPS:
+							fits_in_plane = False
+						elif abs(dot_of(normalized(v1), normalized(v2))) < EPS:
+							fits_in_plane = False	
+
 					if fits_in_plane:
 						plane_indexes += [j]
 						plane_map[j].add(plane_no)
-						if len(plane_map[j]) == 1:
-							new_fire += [j]
+						new_fire += [j]
 		
 		fire = [i for i in new_fire]
 	return sorted(plane_indexes)
@@ -44,17 +52,12 @@ if __name__ == "__main__":
 	f.close()
 
 	print 'Max deviation:', EPS
-	print 'Min dot of normals', NORM_DOT
 	print 'Input model:', INPUT
 
 	vertexes = obj_io.vertexes(input_obj)
 	
 	triangles = obj_io.triangles(input_obj)
 	triangles = [[ti-1 for ti in tis] for tis in triangles]
-
-	normals = obj_io.normals(input_obj)
-	triangle_normals = obj_io.triangle_normals(input_obj)
-	triangle_normals = [[ti-1 for ti in tis] for tis in triangle_normals]
 
 	vertexes_to_triangles = {vi : [] for vi in range(len(vertexes))}
 	for ti in range(len(triangles)):

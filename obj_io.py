@@ -11,7 +11,7 @@ def _str_by_prefix(prefix, elements):
 	st = ""
 	for (a, b, c) in elements:
 		st += prefix + str(a) + ' ' + str(b) + ' ' + str(c) + '\n'
-	return st
+	return st.replace('.', ',')
 
 
 #v 4,875346 21,185596 0,000000
