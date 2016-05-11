@@ -6,8 +6,8 @@ def v__E(a):
 	''' Levi-Civita symbol '''
 	n = 0
 	t = [ti for ti in a]
-	for i in xrange(0,len(a)):
-		for j in xrange(0,len(a)-i-1):
+	for i in xrange(0, len(a)):
+		for j in xrange(0, len(a)-i-1):
 			if t[j]==t[j+1]:
 				return 0
 			if t[j]>t[j+1]:
@@ -19,21 +19,32 @@ def v__E(a):
 		return -1
 
 
-def cross_of(A):
+def precalculate_map_of_E_and_indexes(dimm):
+	N = dimm - 1
+	map_of_E_and_indexes = {}
+	for i in xrange(0, dimm):
+		for jk in xrange(0, dimm ** N):
+			indexes = [i] + [(jk / (dimm ** (N-j-1))) % dimm for j in xrange(0, N)]
+			E = v__E(indexes)
+			map_of_E_and_indexes[(i, jk)] = (E, indexes)
+	return map_of_E_and_indexes
+
+
+def cross_of(A, cached_E_and_indexes = None):
 	''' n-dimensional cross product on (n-1) vectors in list A '''
-	for a in A:
-		assert len(a) == len(A[0]), "Vector size mismatch in 'cross_of'"
 	DIMM = len(A[0])
 	N = len(A)
-	assert N == DIMM-1, "Vector number mismatch in 'cross_of'"
 
 	v_res = [0.] * DIMM
 	for i in xrange(0, DIMM):
-		for jk in xrange(0, DIMM**N):
-			v_ijk = [i] + [(jk/(DIMM ** (N-j-1))) % DIMM for j in range(0, N)]
-			t_res=v__E(v_ijk)
+		for jk in xrange(0, DIMM ** N):
+			if cached_E_and_indexes:
+				(t_res, v_ijk) = cached_E_and_indexes[(i, jk)]
+			else:
+				v_ijk = [i] + [(jk/(DIMM ** (N-j-1))) % DIMM for j in xrange(0, N)]
+				t_res = v__E(v_ijk)
 			if t_res != 0:
-				for k in xrange(0,N):
+				for k in xrange(0, N):
 					t_res *= A[k][v_ijk[k + 1]]
 				v_res[i] += t_res
 	return v_res
@@ -47,25 +58,21 @@ def project_by_vector(point, projection_vector, plane_n, plane_d):
 	k = dot_of(vector(point, ponp), plane_n) / dot_of(projection_vector, plane_n)
 	return sum_of(point, scaled(projection_vector, k))
 
-def exp_solution_for(A, B):
+def solution_for(A, B, cache):
 	p = [0. for each in B]
-	for i in range(len(A)):
+	for i in xrange(len(A)):
 		plane_n = A[i]
 		plane_d = -B[i]
 		other_planes_ns = A[:i] + A[i+1:]
-		projection_vector = cross_of(other_planes_ns)
+		projection_vector = cross_of(other_planes_ns, cache)
 		p = project_by_vector(p, projection_vector, plane_n, plane_d)
 	return p
 
 
-
-def Validate(A, B, X, eps = 0.0001):
-	ret = []
-	for i in range(len(B)):
-		Bi = 0.0
-		for j in range(len(B)):
-			Bi += A[i][j] * X[j]
-		if abs(Bi - B[i]) > eps:
+def is_valid_solution(A, B, X, eps = 0.0001):
+	new_B = [dot_of(Ai, X) for Ai in A]
+	for (Bi, new_Bi) in zip(B, new_B):
+		if abs(Bi - new_Bi) > eps:
 			return False
 	return True
 
@@ -80,8 +87,9 @@ if __name__ == '__main__':
 	print 'Projected point equation fit:', dot_of(plane_n, projected_point) + plane_d
 	
 	timestamp = time.clock()
-	dimm = 5
-	for n in range(0, 100):
+	dimm = 6
+	cache = precalculate_map_of_E_and_indexes(dimm)
+	for n in range(0, 50):
 		A = [[] for each in range(dimm)]
 		B = []
 		for i in range(0, dimm):
@@ -91,8 +99,8 @@ if __name__ == '__main__':
 			B += [randint(-100, 100) / 100.0]
 	
 		try:
-			X = exp_solution_for(A, B)
-			print Validate(A, B, X)
+			X = solution_for(A, B, cache)
+			print is_valid_solution(A, B, X)
 		except ZeroDivisionError:
 			print 'No solution'
 	print 'In', time.clock() - timestamp, 'seconds'
