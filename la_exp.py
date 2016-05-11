@@ -1,12 +1,11 @@
 from oneliners import *
-from types import *
 from random import randint
 import time
 
 def v__E(a):
 	''' Levi-Civita symbol '''
-	n=0
-	t=[ti for ti in a]
+	n = 0
+	t = [ti for ti in a]
 	for i in xrange(0,len(a)):
 		for j in xrange(0,len(a)-i-1):
 			if t[j]==t[j+1]:
@@ -44,10 +43,6 @@ def point_on_plane(n, d):
 	return [-d/n[0]] + [0]*(len(n)-1)
 
 def project_by_vector(point, projection_vector, plane_n, plane_d):
-	assert type(point) is ListType
-	assert type(projection_vector) is ListType
-	assert type(plane_n) is ListType
-	assert type(plane_d) is FloatType 
 	ponp = point_on_plane(plane_n, plane_d)
 	k = dot_of(vector(point, ponp), plane_n) / dot_of(projection_vector, plane_n)
 	return sum_of(point, scaled(projection_vector, k))
