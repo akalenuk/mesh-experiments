@@ -78,19 +78,15 @@ if __name__ == "__main__":
 		neighbours[t3].add(t2)
 
 	# make plane map - vertex_index to list of planes it belongs to	
-	print 'Making plane map...',
+	print 'Making plane map'
 	timestamp = time.clock()
 	vertex_to_planes = [set() for every in vertexes]
 	planes = []
 	for i in range(len(vertexes)):
 		if len(vertex_to_planes[i]) == 0:
 			planes += [find_plane(i, len(planes), vertexes, neighbours, vertex_to_planes)]
-			print "plane ", len(planes), "starts at", i, "and has", len(planes[-1]), "vertixes"
-
-		if i % 1000 == 0 and i != 0:
-			print 1000,
-	print len(triangles) % 1000 
-	print 'Plane marking time - ', time.clock() - timestamp
+			print ', plane', len(planes), 'starts at', i, 'and has', len(planes[-1]), 'vertexes'
+	print 'Plane marking time', time.clock() - timestamp
 	timestamp = time.clock()
 
 	# reverse plane_map
