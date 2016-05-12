@@ -53,10 +53,12 @@ def cross_of(A, cached_E_and_indexes = None):
 def point_on_plane(n, d):
 	return [-d/n[0]] + [0]*(len(n)-1)
 
+
 def project_by_vector(point, projection_vector, plane_n, plane_d):
 	ponp = point_on_plane(plane_n, plane_d)
 	k = dot_of(vector(point, ponp), plane_n) / dot_of(projection_vector, plane_n)
 	return sum_of(point, scaled(projection_vector, k))
+
 
 def solution_for(A, B, cache):
 	p = [0. for each in B]
@@ -76,6 +78,7 @@ def is_valid_solution(A, B, X, eps = 0.0001):
 			return False
 	return True
 
+
 if __name__ == '__main__':
 	plane_n = [2., 3., 1.]
 	plane_d = 4.
@@ -88,8 +91,10 @@ if __name__ == '__main__':
 	
 	timestamp = time.clock()
 	dimm = 6
+	times = 50
+	print 'Performing', times, 'solutions for', dimm, ' equations:'
 	cache = precalculate_map_of_E_and_indexes(dimm)
-	for n in range(0, 50):
+	for each in range(times):
 		A = [[] for each in range(dimm)]
 		B = []
 		for i in range(0, dimm):
@@ -100,7 +105,7 @@ if __name__ == '__main__':
 	
 		try:
 			X = solution_for(A, B, cache)
-			print is_valid_solution(A, B, X)
+			print '+ Valid solution' if is_valid_solution(A, B, X) else '- Invalid solution'
 		except ZeroDivisionError:
-			print 'No solution'
-	print 'In', time.clock() - timestamp, 'seconds'
+			print '* No solution'
+	print 'Done in', time.clock() - timestamp, 'seconds'
