@@ -3,14 +3,14 @@ from random import randint
 import time
 
 def v__E(a):
-	''' Levi-Civita symbol '''
+	''' Levi-Civita symbol (todo - try usort and then distance between sorted and unsorted indexes)'''
 	n = 0
 	t = [ti for ti in a]
 	for i in xrange(0, len(a)):
 		for j in xrange(0, len(a)-i-1):
-			if t[j]==t[j+1]:
+			if t[j] == t[j+1]:
 				return 0
-			if t[j]>t[j+1]:
+			if t[j] > t[j+1]:
 				n+=1
 				t[j], t[j+1] = t[j+1], t[j]
 	if n % 2 == 0:
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 	timestamp = time.clock()
 	dimm = 6
 	times = 50
-	print 'Performing', times, 'solutions for', dimm, ' equations:'
+	print 'Performing', times, 'solutions for', dimm, 'equations:'
 	cache = precalculate_map_of_E_and_indexes(dimm)
 	for each in range(times):
 		A = [[] for each in range(dimm)]
