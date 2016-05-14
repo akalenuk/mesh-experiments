@@ -9,8 +9,7 @@ def distances(X, p):
 def fit_plane(points, initial_plane = [1.]*4):
 	def residuals(params, signal, X):
 	    return distances(X, params)
-
-	return leastsq(residuals, initial_plane, args=(None, points))[0]
+	return leastsq(residuals, initial_plane, args=(None, points), maxfev=100)[0]
 	
 
 if __name__ == "__main__":
