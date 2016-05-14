@@ -3,7 +3,7 @@ from random import randint
 import time
 
 def v__E(a):
-	''' Levi-Civita symbol (todo - try usort and then distance between sorted and unsorted indexes)'''
+	''' Levi-Civita symbol '''
 	n = 0
 	t = [ti for ti in a]
 	for i in xrange(0, len(a)):
@@ -11,7 +11,7 @@ def v__E(a):
 			if t[j] == t[j+1]:
 				return 0
 			if t[j] > t[j+1]:
-				n+=1
+				n += 1
 				t[j], t[j+1] = t[j+1], t[j]
 	if n % 2 == 0:
 		return 1
