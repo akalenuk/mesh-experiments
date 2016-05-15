@@ -4,7 +4,7 @@ import plane_makers
 import numpy
 from oneliners import *
 
-EPS = 0.5
+EPS = 2.5
 INPUT = 'cyllinder.obj'
 OUTPUT = 'ffout.obj'
 
@@ -27,7 +27,6 @@ def find_plane(start_i, plane_no, vertexes, neighbours, plane_map):
 						for d in distances:
 							if abs(d) > EPS:
 								fits_in_plane = False
-
 					if fits_in_plane:
 						plane_indexes += [j]
 						plane_map[j].add(plane_no)
@@ -74,7 +73,7 @@ if __name__ == "__main__":
 	vertex_to_planes = [set() for every in vertexes]
 	planes = []
 	for i in range(len(vertexes)):
-		if len(vertex_to_planes[i]) < 2:
+		if len(vertex_to_planes[i]) < 2: # this should be reconsidered
 			planes += [find_plane(i, len(planes), vertexes, neighbours, vertex_to_planes)]
 			print ', plane', len(planes), 'starts at', i, 'and has', len(planes[-1]), 'vertexes'
 	print 'Plane marking time', time.clock() - timestamp
