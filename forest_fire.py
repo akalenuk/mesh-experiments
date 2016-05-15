@@ -1,41 +1,32 @@
 import time
 import obj_io
-import least_squares
+import plane_makers
 import numpy
 from oneliners import *
 
-EPS = 0.02
-INPUT = 'cube.obj'
+EPS = 0.5
+INPUT = 'cyllinder.obj'
 OUTPUT = 'ffout.obj'
 
 def find_plane(start_i, plane_no, vertexes, neighbours, plane_map):
 	plane_indexes = [start_i]
 	plane_map[start_i].add(plane_no)
-	plane = [1., 0., 0., 0.]
+	plane = [1., 1., 1., 1.]
 	fire = [start_i]
 
 	while len(fire) > 0:
 		new_fire = []
 		for i in fire:
 			for j in neighbours[i]:
-				if not plane_no in plane_map[j]:
+				if not (plane_no in plane_map[j]):
 					fits_in_plane = True
 					if len(plane_indexes) >= 3:
 						pts = numpy.array([vertexes[pi] for pi in plane_indexes] + [vertexes[j]])
-						plane = least_squares.fit_plane(pts)
-						distances = least_squares.distances(pts, plane)
+						plane = plane_makers.fit_plane(pts, initial_plane = plane)
+						distances = plane_makers.distances(pts, plane)
 						for d in distances:
 							if abs(d) > EPS:
 								fits_in_plane = False
-
-					# does it even work?
-					if len(plane_indexes) == 2:
-						v1 = vector(vertexes[j], vertexes[plane_indexes[0]]) 
-						v2 = vector(vertexes[j], vertexes[plane_indexes[1]]) 
-						if length_of(v1) < EPS or length_of(v2) < EPS:
-							fits_in_plane = False
-						elif abs(dot_of(normalized(v1), normalized(v2))) < EPS:
-							fits_in_plane = False	
 
 					if fits_in_plane:
 						plane_indexes += [j]
@@ -83,7 +74,7 @@ if __name__ == "__main__":
 	vertex_to_planes = [set() for every in vertexes]
 	planes = []
 	for i in range(len(vertexes)):
-		if len(vertex_to_planes[i]) == 0:
+		if len(vertex_to_planes[i]) < 2:
 			planes += [find_plane(i, len(planes), vertexes, neighbours, vertex_to_planes)]
 			print ', plane', len(planes), 'starts at', i, 'and has', len(planes[-1]), 'vertexes'
 	print 'Plane marking time', time.clock() - timestamp

@@ -5,7 +5,7 @@ from oneliners import *
 EPS = 2.0
 NORM_DOT = 0.9
 INPUT = 'big_ellipsoid.obj'
-OUTPUT = 'ffout.obj'
+OUTPUT = 'ppout.obj'
 
 def peel(triangle_i, plane_id, plane_n, plane_d):
 	global vertexes, triangles, normals, triangle_normals, vertexes_to_triangles # immutable
