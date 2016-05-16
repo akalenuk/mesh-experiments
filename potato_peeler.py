@@ -23,7 +23,7 @@ def peel(triangle_i, plane_id, plane_n, plane_d):
 	pts = [vertexes[tri] for tri in triangles[triangle_i]]
 	for pt in pts:
 		d = distance_between(pt, projected_on_plane(pt, plane_n, plane_d))
-		if abs(d) > EPS:
+		if d > EPS:
 			return
 
 	# mark plane_map
