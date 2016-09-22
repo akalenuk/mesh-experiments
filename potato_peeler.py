@@ -62,6 +62,14 @@ if __name__ == "__main__":
 		vertexes_to_triangles[triangles[ti][1]] += [ti]
 		vertexes_to_triangles[triangles[ti][2]] += [ti]
 
+	# presort triangles
+	def triangle_area_pow4(tri):
+		v1 = vector(vertexes[tri[1]], vertexes[tri[0]])
+		v2 = vector(vertexes[tri[2]], vertexes[tri[0]])
+		return dot_of(v1, v1) * dot_of(v2, v2) - pow(dot_of(v1, v2), 2)	
+	triangles = sorted(triangles, key=triangle_area_pow4, reverse=True)
+		
+
 	print '  Vertexes:', len(vertexes)
 	print '  Triangles:', len(triangles)
 

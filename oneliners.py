@@ -13,7 +13,7 @@ def length_of(A):
 def normalized(A):
 	return scaled(A, 1.0 / length_of(A))
 
-def identity_dim(n):
+def identity_of_dim(n):
 	return [[1.0 if i==j else 0.0 for j in range(n)] for i in range(n)]
 
 def transposed(A):
@@ -38,7 +38,7 @@ def solution_iteration(A, B, Xi, i):
 	return Xi if distance_between(multiplication_of(A, Xi), B) < 0.0001 else solution_iteration(A, B, projected_on_plane(Xi, A[i % len(B)], B[i % len(B)]), i+1)
 
 def inverted(A):
-	return transposed([solution_for(A, ort) for ort in identity_dim(len(A))])
+	return transposed([solution_for(A, ort) for ort in identity_of_dim(len(A))])
 
 def centroid_of(Ps):
 	return [sum(xi) / len(Ps) for xi in transposed(Ps)]
