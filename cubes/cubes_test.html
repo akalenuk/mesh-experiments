@@ -106,6 +106,35 @@ button {
 // client
 var w = 1024.0;
 var h = 1024.0;
+var step = 64.0;
+
+// tri-float to RGB
+function as_XX(x) {
+    return ((x < 16) ? "0" : "") +x.toString(16);
+}
+
+function as_RRGGBB(r_01, g_01, b_01) {
+    var rgb = [r_01, g_01, b_01];
+    var RRGGBB = "#";
+    for(var i = 0; i < 3; ++i) {
+        if (rgb[i] < 0.0)
+            rgb[i] = 0.0;
+        if (rgb[i] > 255.0/256.0)
+            rgb[i] = 255.0/256;
+        RRGGBB += as_XX(Math.floor(rgb[i] * 256.0));
+    }
+    return RRGGBB;
+}
+
+function d_as_RRGGBB(d) {
+    d_0_1 = Math.atan(Math.floor(d / 64.)) / (Math.PI / 2.0);
+    return as_RRGGBB(d_0_1, d_0_1, 1.0);
+}
+
+// distance function
+function d_f(x, y) {
+    return Math.sqrt((x - 512) * (x - 512) + (y - 512) * (y - 512));
+}
 
 function init_canvas(){
     var canvas = document.getElementById("canvas");
@@ -122,6 +151,26 @@ function draw_canvas(client_x, client_y, do_guides){
     context.fillStyle="#eeeeee";
     context.fillRect(0, 0, w, h);
 
+    // distance function
+    for(var i = 0; i <= h; i += 1.0) 
+        for(var j = 0; j <= w; j += 1.0) {
+            context.fillStyle = d_as_RRGGBB(d_f(j, i));
+            context.fillRect(j-0.5, i-0.5, 1.0, 1.0);
+        }
+    
+
+    // grid
+    context.beginPath();
+    for(var i = 0; i <= h; i += step) {
+        context.moveTo(0.0, i);
+        context.lineTo(w, i);
+    }
+    for(var j = 0; j <= w; j += step) {
+        context.moveTo(j, 0.0);
+        context.lineTo(j, h);
+    }
+    context.stroke();
+    context.closePath();
 }
     </script>
   </head>
