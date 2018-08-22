@@ -107,6 +107,7 @@ button {
 var w = 1024.0;
 var h = 1024.0;
 var step = 64.0;
+var distance = 250.0;
 
 // tri-float to RGB
 function as_XX(x) {
@@ -158,6 +159,20 @@ function draw_canvas(client_x, client_y, do_guides){
             context.fillRect(j-0.5, i-0.5, 1.0, 1.0);
         }
     
+    // in target distance
+    context.beginPath();
+    for(var i = 0; i <= h-1; i += step) {
+        for(var j = 0; j <= w-1; j += step) {
+            if( d_f(j + step / 2.0, i + step / 2.0) <= distance ) {
+                context.moveTo(j + step * 0.25, i + step * 0.5);
+                context.lineTo(j + step * 0.75, i + step * 0.5);
+                context.moveTo(j + step * 0.5, i + step * 0.25);
+                context.lineTo(j + step * 0.5, i + step * 0.75);                
+            }            
+        }
+    }
+    context.stroke();
+    context.closePath();
 
     // grid
     context.beginPath();
