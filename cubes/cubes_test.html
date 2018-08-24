@@ -171,6 +171,7 @@ function draw_canvas(client_x, client_y, do_guides){
             }            
         }
     }
+    context.strokeStyle="#777777";
     context.stroke();
     context.closePath();
 
@@ -184,6 +185,33 @@ function draw_canvas(client_x, client_y, do_guides){
         context.moveTo(j, 0.0);
         context.lineTo(j, h);
     }
+    context.strokeStyle="#000000";
+    context.lineWidth=1;
+    context.stroke();
+    context.closePath();
+ 
+    // non-shifted cubes
+    context.beginPath();
+    for(var i = 0; i <= h-2; i += step) {
+        for(var j = 0; j <= w-2; j += step) {
+            var do_horizontal = 
+		(d_f(j + 0.5 * step, i - 0.5 * step) - distance ) *
+		(d_f(j + 0.5 * step, i + 0.5 * step) - distance ) < 0 ? true : false;
+            var do_vertical = 
+		(d_f(j - 0.5 * step, i + 0.5 * step) - distance ) *
+		(d_f(j + 0.5 * step, i + 0.5 * step) - distance ) < 0 ? true : false;
+            if(do_horizontal) {
+                context.moveTo(j, i);
+                context.lineTo(j + step, i);
+            }
+            if(do_vertical) {
+                context.moveTo(j, i);
+                context.lineTo(j, i + step);                
+            }            
+        }
+    }
+    context.strokeStyle="#AA5555";
+    context.lineWidth=3;
     context.stroke();
     context.closePath();
 }
