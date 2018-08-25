@@ -107,7 +107,7 @@ button {
 var w = 1024.0;
 var h = 1024.0;
 var step = 64.0;
-var distance = 250.0;
+var distance = 256.0;
 
 // tri-float to RGB
 function as_XX(x) {
@@ -138,13 +138,13 @@ function d_f(x, y) {
 }
 
 function gsx(x, y, distance) {
-    dd = d_f(x, y) - distance;
+    dd = distance - d_f(x, y);
     dx = ( d_f(x+1, y) - d_f(x, y) );
     return dx * dd;
 }
 
 function gsy(x, y, distance) {
-    dd = d_f(x, y) - distance;
+    dd = distance - d_f(x, y);
     dy = ( d_f(x, y+1) - d_f(x, y) );
     return dy * dd;
 }
