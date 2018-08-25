@@ -132,6 +132,14 @@ function d_as_RRGGBB(d) {
     return as_RRGGBB(d_0_1, d_0_1, 1.0);
 }
 
+function step_limited(x) {
+    if(x < -step)
+        return -step;
+    if(x > +step)
+        return +step;
+    return x;
+}
+
 // distance function
 function d_f(x, y) {
     return Math.sqrt((x - 512) * (x - 512) + (y - 512) * (y - 512));
@@ -140,13 +148,13 @@ function d_f(x, y) {
 function gsx(x, y, distance) {
     dd = distance - d_f(x, y);
     dx = ( d_f(x+1, y) - d_f(x, y) );
-    return dx * dd;
+    return step_limited(dx * dd);
 }
 
 function gsy(x, y, distance) {
     dd = distance - d_f(x, y);
     dy = ( d_f(x, y+1) - d_f(x, y) );
-    return dy * dd;
+    return step_limited(dy * dd);
 }
 
 function init_canvas(){
