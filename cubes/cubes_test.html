@@ -137,6 +137,18 @@ function d_f(x, y) {
     return Math.sqrt((x - 512) * (x - 512) + (y - 512) * (y - 512));
 }
 
+function gsx(x, y, distance) {
+    dd = d_f(x, y) - distance;
+    dx = ( d_f(x+1, y) - d_f(x, y) );
+    return dx * dd;
+}
+
+function gsy(x, y, distance) {
+    dd = d_f(x, y) - distance;
+    dy = ( d_f(x, y+1) - d_f(x, y) );
+    return dy * dd;
+}
+
 function init_canvas(){
     var canvas = document.getElementById("canvas");
     canvas.addEventListener('mouseup', function(e){
@@ -211,6 +223,31 @@ function draw_canvas(client_x, client_y, do_guides){
         }
     }
     context.strokeStyle="#AA5555";
+    context.lineWidth=3;
+    context.stroke();
+    context.closePath();
+
+    // shifted cubes
+    context.beginPath();
+    for(var i = 0; i <= h-2; i += step) {
+        for(var j = 0; j <= w-2; j += step) {
+            var do_horizontal = 
+		(d_f(j + 0.5 * step, i - 0.5 * step) - distance ) *
+		(d_f(j + 0.5 * step, i + 0.5 * step) - distance ) < 0 ? true : false;
+            var do_vertical = 
+		(d_f(j - 0.5 * step, i + 0.5 * step) - distance ) *
+		(d_f(j + 0.5 * step, i + 0.5 * step) - distance ) < 0 ? true : false;
+            if(do_horizontal) {
+                context.moveTo(j + gsx(j, i, distance), i + gsy(j, i, distance));
+                context.lineTo(j + step + gsx(j + step, i, distance), i + gsy(j + step, i, distance));
+            }
+            if(do_vertical) {
+                context.moveTo(j + gsx(j, i, distance), i + gsy(j, i, distance));
+                context.lineTo(j + gsx(j, i + step, distance), i + step + gsy(j, i + step, distance));
+            }
+        }
+    }
+    context.strokeStyle="#55AA55";
     context.lineWidth=3;
     context.stroke();
     context.closePath();
