@@ -109,6 +109,10 @@ var distance = 32.0 * 3;
 
 var points = [];
 
+// animation, not essencial for the algorithm
+var animation_d = distance;
+var FPS = 8;
+
 // tri-float to RGB
 function as_XX(x) {
     return ((x < 16) ? "0" : "") +x.toString(16);
@@ -280,24 +284,58 @@ function dec(counter_name) {
     counter.value = Number(counter.value) - 1;
     eval('change_' + counter_name + '()');
 }
+
+function reset_points() {
+    points = [];
+    draw_canvas(0, 0, false);
+}
+
+function alter_animation_d(dd) {
+    animation_d += dd;
+    if(animation_d < step) {
+        animation_d = step;
+    }
+    if(animation_d > w) {
+        animation_d = w;
+    }
+}
+
+function tick() {
+    if(distance != animation_d) {
+        if(distance < animation_d)
+            distance += 1;
+        if(distance > animation_d)
+            distance -= 1;
+        document.getElementById("distance").value = distance;            
+        draw_canvas(0, 0, false);
+    }
+    setTimeout( function(){tick();}, 1000.0 / FPS);
+}
+
+tick(); // let it tick always
     </script>
   </head>
   <body>
     <center>
     <h1>
-Cubes test
+
     </h1>
     
     <form onsubmit="return false;">
     Distance:
+    <button type="button" onclick="alter_animation_d(-step)">&lt;&lt;</button>
     <button type="button" onclick="dec('distance')">-</button>
     <input type="text" id="distance" value="96" oninput="change_distance();">
     <button type="button" onclick="inc('distance')">+</button>
+    <button type="button" onclick="alter_animation_d(+step)">&gt;&gt;</button>
     </form>
     <canvas id="canvas" width=640 height=640></canvas>
     <script language="JavaScript">
     init_canvas();
     </script>
+    <div style="text-align:right; width:640px; padding-bottom:12pt;">
+        <button type="button" style="width: 108pt;" onclick="reset_points()">Reset</button>
+    </div>    
 
     </center>
   </body>
