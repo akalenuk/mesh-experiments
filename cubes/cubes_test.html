@@ -104,10 +104,10 @@ button {
     <script language="JavaScript">
 
 // client
-var w = 1024.0;
-var h = 1024.0;
-var step = 64.0;
-var distance = 256.0;
+var w = 640.0;
+var h = 640.0;
+var step = 32.0;
+var distance = 32.0 * 3;
 
 // tri-float to RGB
 function as_XX(x) {
@@ -173,28 +173,14 @@ function draw_canvas(client_x, client_y, do_guides){
     context.fillRect(0, 0, w, h);
 
     // distance function
+    context.fillStyle = "#5555aa";
     for(var i = 0; i <= h; i += 1.0) 
         for(var j = 0; j <= w; j += 1.0) {
-            context.fillStyle = d_as_RRGGBB(d_f(j, i));
-            context.fillRect(j-0.5, i-0.5, 1.0, 1.0);
-        }
+            d = d_f(j, i);
+            if (d <= distance)
+                context.fillRect(j-0.5, i-0.5, 1.0, 1.0);
+        } 
     
-    // in target distance
-    context.beginPath();
-    for(var i = 0; i <= h-1; i += step) {
-        for(var j = 0; j <= w-1; j += step) {
-            if( d_f(j + step / 2.0, i + step / 2.0) <= distance ) {
-                context.moveTo(j + step * 0.25, i + step * 0.5);
-                context.lineTo(j + step * 0.75, i + step * 0.5);
-                context.moveTo(j + step * 0.5, i + step * 0.25);
-                context.lineTo(j + step * 0.5, i + step * 0.75);                
-            }            
-        }
-    }
-    context.strokeStyle="#777777";
-    context.stroke();
-    context.closePath();
-
     // grid
     context.beginPath();
     for(var i = 0; i <= h; i += step) {
@@ -255,7 +241,7 @@ function draw_canvas(client_x, client_y, do_guides){
             }
         }
     }
-    context.strokeStyle="#55AA55";
+    context.strokeStyle="#33AA33";
     context.lineWidth=3;
     context.stroke();
     context.closePath();
@@ -268,7 +254,7 @@ function draw_canvas(client_x, client_y, do_guides){
 Cubes test
     </h1>
     
-    <canvas id="canvas" width=1024 height=1024></canvas>
+    <canvas id="canvas" width=640 height=640></canvas>
     <script language="JavaScript">
     init_canvas();
     </script>
