@@ -186,8 +186,8 @@ function draw_canvas(client_x, client_y, do_guides){
 
     // distance function
     context.fillStyle = "#5555aa";
-    for(var i = 0; i <= h; i += 1.0) 
-        for(var j = 0; j <= w; j += 1.0) {
+    for(var i = 0; i <= h; i += 4.0) 
+        for(var j = 0; j <= w; j += 4.0) {
             d = d_f(j, i);
             if (d <= distance)
                 context.fillRect(j-0.5, i-0.5, 1.0, 1.0);
