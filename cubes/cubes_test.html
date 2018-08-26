@@ -86,19 +86,17 @@ form {
 }
 
 input[type="text"] {
-    width: 100pt;
+    width: 32pt;
     height: 22pt;
-    margin: 8pt 8pt 8pt 8pt;
-    padding-left: 3pt;
     font-size: 16pt;
+    text-align: center;
 }
 
 button {
-    width: 108pt;
-    height: 28pt;
-    margin-left:4pt;
-    margin-right:4pt;
+    width: 32pt;
+    height: 26pt;
     font-size: 16pt;
+    text-align: center;
 }
     </style>
     <script language="JavaScript">
@@ -258,6 +256,30 @@ function draw_canvas(client_x, client_y, do_guides){
     context.stroke();
     context.closePath();
 }
+
+function change_distance() {
+    distance = Number(document.getElementById("distance").value);
+    if(isNaN(distance) || distance < step) {
+        distance = step;
+    }
+    if(distance > w) {
+        distance = w;
+    }
+    document.getElementById("distance").value = distance;
+    draw_canvas(0, 0, false);
+}
+
+function inc(counter_name) {
+    var counter = document.getElementById(counter_name);
+    counter.value = Number(counter.value) + 1;
+    eval('change_' + counter_name + '()');
+}
+
+function dec(counter_name) {
+    var counter = document.getElementById(counter_name);
+    counter.value = Number(counter.value) - 1;
+    eval('change_' + counter_name + '()');
+}
     </script>
   </head>
   <body>
@@ -266,6 +288,12 @@ function draw_canvas(client_x, client_y, do_guides){
 Cubes test
     </h1>
     
+    <form onsubmit="return false;">
+    Distance:
+    <button type="button" onclick="dec('distance')">-</button>
+    <input type="text" id="distance" value="96" oninput="change_distance();">
+    <button type="button" onclick="inc('distance')">+</button>
+    </form>
     <canvas id="canvas" width=640 height=640></canvas>
     <script language="JavaScript">
     init_canvas();
