@@ -109,6 +109,8 @@ var h = 640.0;
 var step = 32.0;
 var distance = 32.0 * 3;
 
+var points = [];
+
 // tri-float to RGB
 function as_XX(x) {
     return ((x < 16) ? "0" : "") +x.toString(16);
@@ -142,7 +144,15 @@ function step_limited(x) {
 
 // distance function
 function d_f(x, y) {
-    return Math.sqrt((x - 512) * (x - 512) + (y - 512) * (y - 512));
+    if (points.length == 0)
+        return distance + 1.0; // no distance field
+    var d = Math.sqrt((x - points[0][0]) * (x - points[0][0]) + (y - points[0][1]) * (y - points[0][1]));
+    for (var i = 1; i < points.length; ++i) {
+        var di = Math.sqrt((x - points[i][0]) * (x - points[i][0]) + (y - points[i][1]) * (y - points[i][1]));
+        if (di < d)
+            d = di;
+    }
+    return d;
 }
 
 function gsx(x, y, distance) {
@@ -159,8 +169,10 @@ function gsy(x, y, distance) {
 
 function init_canvas(){
     var canvas = document.getElementById("canvas");
-    canvas.addEventListener('mouseup', function(e){
-       alert("up");
+    canvas.addEventListener('click', function(e){
+       canvas_rect = canvas.getBoundingClientRect();
+       points.push([e.clientX - canvas_rect.left, e.clientY - canvas_rect.top]);
+       draw_canvas(0, 0, false);
     }, false);
     draw_canvas(0, 0, false);
 }
