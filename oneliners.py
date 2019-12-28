@@ -4,8 +4,14 @@ def scaled(A, x):
 def sum_of(A, B):
 	return [ai+bi for (ai, bi) in zip(A, B)]
 
+def sub_of(A, B):
+	return [ai-bi for (ai, bi) in zip(A, B)]
+
 def dot_of(A, B):
 	return sum([ai*bi for (ai, bi) in zip(A, B)])
+
+def cross_of(A, B):
+	return [A[1] * B[2] - A[2] * B[1], A[2] * B[0] - A[0] * B[2], A[0] * B[1] - A[1] * B[0]]
 
 def length_of(A):
 	return pow(dot_of(A, A), 0.5)
