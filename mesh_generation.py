@@ -34,7 +34,6 @@ def triangulate(sdf, p0, scale, subdivisions, ts, vs):
         p31 = sum_of(sum_of(p0, scaled(a3, scale)), scaled(a1, scale))
         p123 = sum_of(sum_of(p0, scaled(a1, scale)), sum_of(scaled(a2, scale), scaled(a3, scale)))
         ps = [p0, p1, p2, p3, p12, p23, p31, p123]
-        print a1, a2, a3, ps
         sdfs = [sdf(p) for p in ps]
         def triangulate_tetrahedron(ps, sdfs, indices, ts, vs):
             for i in range(4):
@@ -63,7 +62,7 @@ def triangulate(sdf, p0, scale, subdivisions, ts, vs):
 if __name__ == "__main__":
     vs = []
     ts = []
-    triangulate(SDF, [-R3/2., 0, -R3/2.], 1, 0, ts, vs)
+    triangulate(SDF, [-3*R3/2., 0, -R3/2.], 2, 4, ts, vs)
     print ("triangles: " + str(len(ts)) + "   vertices: " + str(len(vs)))
 
     f = open(OUTPUT, 'w')
