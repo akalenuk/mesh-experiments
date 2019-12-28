@@ -25,29 +25,30 @@ def add_tri(f, a, p1, p2, p0, i1, i2, in1, in2, vs, ts, x):
     in_vs = False
     new_point_i = len(vs)
     for i in range(len(vs)):
-        if distance_between(vs[i], new_snapped_point) < a*R3/4.:
+        if distance_between(vs[i], new_snapped_point) < a*R3/2.:
             in_vs = True
             new_point_i = i
             new_snapped_point = vs[i]
             break
-    if in1 and in2 and in_vs:
-        return
+    for i in range(len(ts)):
+        if sorted(ts[i]) == sorted([i1, i2, new_point_i]):
+            return
     if not in_vs:
         vs += [new_snapped_point]
     ts += [[i1, i2, new_point_i]]
     add_tri(f, a, p1, new_snapped_point, p2, i1, new_point_i, in1, in_vs, vs, ts, x-1)
-    add_tri(f, a, p2, new_snapped_point, p1, i2, new_point_i, in2, in_vs, vs, ts, x-1)
+    add_tri(f, a, new_snapped_point, p2, p1, new_point_i, i2, in_vs, in2, vs, ts, x-1)
 
 
 if __name__ == "__main__":
     vs = []
     ts = []
-    a = 0.4
+    a = 0.1
 
     first_tri_ps = [snap(SDF, [0., 0., 1.]), snap(SDF, [0., 0.1, 1.]), snap(SDF, [0.1, 0., 1.])]
     vs += [snap(SDF, [0., 0., 1.]), snap(SDF, [0., a, 1.])]
 
-    add_tri(SDF, a, vs[0], vs[1],  snap(SDF, [a, 0., 1.]), 0, 1, True, True, vs, ts, 4)
+    add_tri(SDF, a, vs[0], vs[1],  snap(SDF, [a, 0., 1.]), 0, 1, True, True, vs, ts, 512)
     
     print ("triangles: " + str(len(ts)) + "   vertices: " + str(len(vs)))
 
