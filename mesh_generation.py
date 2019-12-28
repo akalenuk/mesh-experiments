@@ -15,6 +15,19 @@ def grad(f, xyz):
 def snap(f, xyz):
     return sum_of(xyz, scaled(normalized(grad(f, xyz)), -f(xyz)))
 
+def is_proj_in_tri(xyz, xyz1, xyz2, xyz3):
+    a1 = sub_of(xyz2, xyz1)
+    a2 = sub_of(xyz3, xyz1)
+    a3 = cross_of(a1, a2)
+    # 3-axis equation
+    x1, y1, z1 = tuple(a1)
+    x2, y2, z2 = tuple(a2)
+    x3, y3, z3 = tuple(a3)
+    x, y, z = tuple(xyz)
+    a = (x*(y2*z3 - y3*z2) - y*(x2*z3 - x3*z2) + z*(x2*y3 - x3*y2))/(x1*y2*z3 - x1*y3*z2 - x2*y1*z3 + x2*y3*z1 + x3*y1*z2 - x3*y2*z1)
+    b = (-x*(y1*z3 - y3*z1) + y*(x1*z3 - x3*z1) - z*(x1*y3 - x3*y1))/(x1*y2*z3 - x1*y3*z2 - x2*y1*z3 + x2*y3*z1 + x3*y1*z2 - x3*y2*z1)
+    return a >= 0 and b >= 0 and a + b <=1
+
 def add_tri(f, a, p1, p2, p0, i1, i2, in1, in2, vs, ts, x):
     if x == 0:
         return
@@ -30,12 +43,12 @@ def add_tri(f, a, p1, p2, p0, i1, i2, in1, in2, vs, ts, x):
     new_point_i = len(vs)
     for i in range(len(vs)):
         if distance_between(vs[i], new_snapped_point) < min(d1, d2):
-            # todo: the in_tri check
-            
-            in_vs = True
-            new_point_i = i
-            new_snapped_point = vs[i]
-            break
+            # the in_tri check
+            if is_proj_in_tri(vs[i], p1, p2, new_snapped_point):
+                in_vs = True
+                new_point_i = i
+                new_snapped_point = vs[i]
+                break
     for i in range(len(ts)):
         if sorted(ts[i]) == sorted([i1, i2, new_point_i]):
             return
@@ -54,12 +67,12 @@ def add_tri(f, a, p1, p2, p0, i1, i2, in1, in2, vs, ts, x):
 if __name__ == "__main__":
     vs = []
     ts = []
-    a = 0.1
+    a = 0.2
 
     first_tri_ps = [snap(SDF, [0., 0., 1.]), snap(SDF, [0., 0.1, 1.]), snap(SDF, [0.1, 0., 1.])]
     vs += [snap(SDF, [0., 0., 1.]), snap(SDF, [0., a, 1.])]
 
-    add_tri(SDF, a, vs[0], vs[1],  snap(SDF, [a, 0., 1.]), 0, 1, True, True, vs, ts, 512)
+    add_tri(SDF, a, vs[0], vs[1],  snap(SDF, [a, 0., 1.]), 0, 1, True, True, vs, ts, 16)
     
     print ("triangles: " + str(len(ts)) + "   vertices: " + str(len(vs)))
 
