@@ -7,9 +7,9 @@ SDF = lambda xyz : (xyz[0]**2 + xyz[1]**2 + xyz[2]**2) ** 0.5 - 1.    # spere 0-
 R3 = 97./56.
 
 # three axes
-a1 = [R3, 0.5, 0]
-a2 = [R3, -0.5, 0]
-a3 = [0.5, 0, R3]
+a1 = [R3, 1., 0]
+a2 = [R3, -1., 0]
+a3 = [1., 0, R3]
 
 def triangulate(sdf, p0, scale, subdivisions, ts, vs):
     if subdivisions > 0:
@@ -62,9 +62,9 @@ def triangulate(sdf, p0, scale, subdivisions, ts, vs):
 if __name__ == "__main__":
     vs = []
     ts = []
-    triangulate(SDF, [-3*R3, 0, -R3], 4, 4, ts, vs)
+    triangulate(SDF, [-3*R3, 0, -R3], 4, 2, ts, vs)
     print ("triangles: " + str(len(ts)) + "   vertices: " + str(len(vs)))
-    
+
     f = open(OUTPUT, 'w')
     f.write(obj_io.str_from_vertexes(vs))
     f.write('\n')
