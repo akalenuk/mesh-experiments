@@ -35,16 +35,29 @@ def triangulate(sdf, p0, scale, subdivisions, ts, vs):
         p123 = sum_of(sum_of(p0, scaled(a1, scale)), sum_of(scaled(a2, scale), scaled(a3, scale)))
         ps = [p0, p1, p2, p3, p12, p23, p31, p123]
         sdfs = [sdf(p) for p in ps]
-        if sum([1 for f in sdfs if f > 0]) == 8: # no conflict
-            return
-        tis = [[0, 1, 2], [0, 2, 3], [0, 3, 1], 
-               [1, 2, 4], [2, 3, 5], [3, 1, 6],
-               [1, 4, 6], [2, 5, 4], [3, 6, 5],
-               [7, 6, 5], [7, 5, 4], [7, 4, 6]]
-        for ti in tis:
-            if sdf(ps[ti[0]]) > 0 and sdf(ps[ti[1]]) > 0 and sdf(ps[ti[2]]) > 0:
-                ts += [[len(vs), len(vs)+1, len(vs)+2]]
-                vs += [ps[ti[0]], ps[ti[1]], ps[ti[2]]]
+        def triangulate_tetrahedron(ps, sdfs, indices, ts, vs):
+            for i in range(4):
+                if sdfs[indices[i]] < 0 and sdfs[indices[(i + 1) % 4]] > 0 and sdfs[indices[(i + 2) % 4]] > 0 and sdfs[indices[(i + 3) % 4]] > 0:
+                    ts += [[len(vs), len(vs)+1, len(vs)+2]]
+                    vs += [ps[indices[(i + 1) % 4]], ps[indices[(i + 2) % 4]], ps[indices[(i + 3) % 4]]]
+        def triangulate_octahedron(ps, sdfs, indices, ts, vs):
+            if sum([1 for i in indices if sdf(ps[i]) > 0]) == 6: # no conflict
+                return
+            t8s = [[indices[0], indices[1], indices[2]],
+                   [indices[0], indices[1], indices[3]],
+                   [indices[1], indices[2], indices[4]],
+                   [indices[2], indices[0], indices[5]],
+                   [indices[3], indices[4], indices[1]],
+                   [indices[4], indices[5], indices[2]],
+                   [indices[5], indices[3], indices[0]],
+                   [indices[5], indices[3], indices[4]]]
+            for ti in t8s:
+                if sdf(ps[ti[0]]) > 0 and sdf(ps[ti[1]]) > 0 and sdf(ps[ti[2]]) > 0:
+                    ts += [[len(vs), len(vs)+1, len(vs)+2]]
+                    vs += [ps[ti[0]], ps[ti[1]], ps[ti[2]]]
+        triangulate_tetrahedron(ps, sdfs, [0, 1, 2, 3], ts, vs)
+        triangulate_octahedron(ps, sdfs, [1, 2, 3, 4, 5, 6], ts, vs)
+        triangulate_tetrahedron(ps, sdfs, [7, 6, 5, 4], ts, vs)
 
 if __name__ == "__main__":
     vs = []
