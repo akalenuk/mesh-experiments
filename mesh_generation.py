@@ -23,11 +23,15 @@ def add_tri(f, a, p1, p2, p0, i1, i2, in1, in2, vs, ts, x):
     new_point = sum_of(scaled(sum_of(p1, p2), 0.5), scaled(new_point_dir, a))
     new_snapped_point = snap(f, new_point)
     
+    d1 = distance_between(new_snapped_point, p1)
+    d2 = distance_between(new_snapped_point, p2)
+    
     in_vs = False
     new_point_i = len(vs)
     for i in range(len(vs)):
-        # todo do the projection in tri check
-        if distance_between(vs[i], new_snapped_point) < a*R3/2.:
+        if distance_between(vs[i], new_snapped_point) < min(d1, d2):
+            # todo: the in_tri check
+            
             in_vs = True
             new_point_i = i
             new_snapped_point = vs[i]
