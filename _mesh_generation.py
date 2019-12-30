@@ -16,6 +16,8 @@ def snap(f, xyz):
     return sum_of(xyz, scaled(normalized(grad(f, xyz)), -f(xyz)))
 
 def add_tri(f, a, p1, p2, p0, i1, i2, vs, ts, it):
+    if it == 3: # exploratory
+        return
     old_norm = normalized(cross_of(sub_of(p0, p1), sub_of(p2, p1)))
     new_point_dir = normalized(cross_of(old_norm, sub_of(p2, p1)))
     new_point = sum_of(scaled(sum_of(p1, p2), 0.5), scaled(new_point_dir, a))
@@ -32,14 +34,8 @@ def add_tri(f, a, p1, p2, p0, i1, i2, vs, ts, it):
     vs += [new_snapped_point]
     ts += [[i1, i2, new_point_i]]
     
-    if it % 2 == 0:
-        add_tri(f, a, p1, new_snapped_point, p2, i1, new_point_i, vs, ts, it+1)
-        add_tri(f, a, new_snapped_point, p2, p1, new_point_i, i2, vs, ts, it+1)
-    else:
-        add_tri(f, a, new_snapped_point, p2, p1, new_point_i, i2, vs, ts, it+1)   
-        add_tri(f, a, p1, new_snapped_point, p2, i1, new_point_i, vs, ts, it+1)
-        
-
+    add_tri(f, a, p1, new_snapped_point, p2, i1, new_point_i, vs, ts, it+1)
+    add_tri(f, a, new_snapped_point, p2, p1, new_point_i, i2, vs, ts, it+1)
 
 
 if __name__ == "__main__":
