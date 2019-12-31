@@ -3,8 +3,13 @@ import obj_io
 from oneliners import *
 
 OUTPUT = 'ppout.obj'
-SDF = lambda xyz : (xyz[0]**2 + xyz[1]**2 + xyz[2]**2) ** 0.5 - 1.    # spere 0-1
-R3 = 3**0.5
+SDF = lambda xyz : (xyz[0]**2 + xyz[1]**2 + xyz[2]**2) ** 0.5 - 0.5    # spere 0-0.5
+R3 = 97./56.
+
+# three axes
+a1 = [R3, 1., 0]
+a2 = [R3, -1., 0]
+a3 = [1., 0, R3]
 
 def grad(f, xyz):
     EPS = 1.e-5;
@@ -15,39 +20,65 @@ def grad(f, xyz):
 def snap(f, xyz):
     return sum_of(xyz, scaled(normalized(grad(f, xyz)), -f(xyz)))
 
-def add_tri(f, a, p1, p2, p0, i1, i2, vs, ts, it):
-    if it == 3: # exploratory
-        return
-    old_norm = normalized(cross_of(sub_of(p0, p1), sub_of(p2, p1)))
-    new_point_dir = normalized(cross_of(old_norm, sub_of(p2, p1)))
-    new_point = sum_of(scaled(sum_of(p1, p2), 0.5), scaled(new_point_dir, a))
-    new_snapped_point = snap(f, new_point)
-    
-    d1 = distance_between(new_snapped_point, p1)
-    d2 = distance_between(new_snapped_point, p2)
-    
-    for i in range(len(vs)):
-        if distance_between(vs[i], new_snapped_point) < min(d1, d2):
+
+def triangulate(sdf, p0, scale, subdivisions, ts, vs):
+    if subdivisions > 0:
+        # subdivide
+        p1 = sum_of(p0, scaled(a1, scale / 2.))
+        p2 = sum_of(p0, scaled(a2, scale / 2.))
+        p3 = sum_of(p0, scaled(a3, scale / 2.))
+        p12 = sum_of(sum_of(p0, scaled(a1, scale / 2.)), scaled(a2, scale / 2.))
+        p23 = sum_of(sum_of(p0, scaled(a2, scale / 2.)), scaled(a3, scale / 2.))
+        p31 = sum_of(sum_of(p0, scaled(a3, scale / 2.)), scaled(a1, scale / 2.))
+        p123 = sum_of(sum_of(p0, scaled(a1, scale / 2.)), sum_of(scaled(a2, scale / 2.), scaled(a3, scale / 2.)))
+        ps = [p0, p1, p2, p3, p12, p23, p31, p123]
+        for p in ps:
+            triangulate(sdf, p, scale / 2., subdivisions - 1, ts, vs)
+    else:
+        # triangulate
+        p1 = sum_of(p0, scaled(a1, scale))
+        p2 = sum_of(p0, scaled(a2, scale))
+        p3 = sum_of(p0, scaled(a3, scale))
+        p12 = sum_of(sum_of(p0, scaled(a1, scale)), scaled(a2, scale))
+        p23 = sum_of(sum_of(p0, scaled(a2, scale)), scaled(a3, scale))
+        p31 = sum_of(sum_of(p0, scaled(a3, scale)), scaled(a1, scale))
+        p123 = sum_of(sum_of(p0, scaled(a1, scale)), sum_of(scaled(a2, scale), scaled(a3, scale)))
+        ps = [p0, p1, p2, p3, p12, p23, p31, p123]
+        sdfs = [sdf(p) for p in ps]
+        if sum([1 for p in ps if sdf(p) > 0]) == 8: # no conflict
             return
+
+        def xyz(i, j, quad):
+            ti = i / 4.
+            tj = j / 4.
+            return sum_of(
+                sum_of(
+                    scaled(scaled(quad[0], 1-ti), 1-tj), 
+                    scaled(scaled(quad[1], 1-ti), tj)),
+                sum_of(
+                    scaled(scaled(quad[2], ti), 1-tj), 
+                    scaled(scaled(quad[3], ti), tj)))
+
+        quads = [[p0,  p1,  p2,  p12], [p0, p2,   p3,  p23], [p0, p3,  p1,  p31],
+                 [p1, p12, p31, p123], [p2, p23, p12, p123], [p3, p23, p31, p123]]
+        for quad in quads:
+            if sum([1 for p in quad if sdf(p) > 0]) == 4: # quad is out
+                for i in range(4):
+                    for j in range(4):
+                        tsi = len(vs)
+                        vs += [snap(sdf, xyz(i,j, quad))]
+                        vs += [snap(sdf, xyz(i,j+1, quad))]
+                        vs += [snap(sdf, xyz(i+1,j, quad))]
+                        vs += [snap(sdf, xyz(i+1,j+1, quad))]
+                        ts += [[tsi, tsi+1, tsi+2]]
+                        ts += [[tsi+2, tsi+1, tsi+3]]
+
  
-    new_point_i = len(vs)
-    vs += [new_snapped_point]
-    ts += [[i1, i2, new_point_i]]
-    
-    add_tri(f, a, p1, new_snapped_point, p2, i1, new_point_i, vs, ts, it+1)
-    add_tri(f, a, new_snapped_point, p2, p1, new_point_i, i2, vs, ts, it+1)
-
-
 if __name__ == "__main__":
     vs = []
     ts = []
-    a = 0.2
+    triangulate(SDF, [-3*R3/2., 0, -R3/2.], 2, 2, ts, vs)
 
-    first_tri_ps = [snap(SDF, [0., 0., 1.]), snap(SDF, [0., 0.1, 1.]), snap(SDF, [0.1, 0., 1.])]
-    vs += [snap(SDF, [0., 0., 1.]), snap(SDF, [0., a, 1.])]
-
-    add_tri(SDF, a, vs[0], vs[1],  snap(SDF, [a, 0., 1.]), 0, 1, vs, ts, 0)
-    
     print ("triangles: " + str(len(ts)) + "   vertices: " + str(len(vs)))
 
     f = open(OUTPUT, 'w')
