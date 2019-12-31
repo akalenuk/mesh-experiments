@@ -3,17 +3,13 @@ import obj_io
 from oneliners import *
 
 OUTPUT = 'ppout.obj'
-#SDF = lambda xyz : (xyz[0]**2 + xyz[1]**2 + xyz[2]**2) ** 0.5 - 0.5    # spere 0-0.5
-SDF = lambda xyz : (((xyz[0]**2 + xyz[1]**2)**0.5 - 1.) ** 2 + xyz[2]**2)**0.5 - 0.25    # thor R = 1, r = 0.25
+SDF = lambda xyz : (xyz[0]**2 + xyz[1]**2 + xyz[2]**2) ** 0.5 - 0.5    # spere 0-0.5
 R3 = 97./56.
 
 # three axes
-#a1 = [R3, 1., 0]
-#a2 = [R3, -1., 0]
-#a3 = [1., 0, R3]
-a1 = [1., 0., 0.]
-a2 = [0., 1., 0.]
-a3 = [0., 0., 1.]
+a1 = [R3, 1., 0]
+a2 = [R3, -1., 0]
+a3 = [1., 0, R3]
 
 def grad(f, xyz):
     EPS = 1.e-5;
@@ -81,7 +77,7 @@ def triangulate(sdf, p0, scale, subdivisions, ts, vs):
 if __name__ == "__main__":
     vs = []
     ts = []
-    triangulate(SDF, [-2., -2., -2.], 4, 3, ts, vs)
+    triangulate(SDF, [-3*R3/2., 0, -R3/2.], 2, 2, ts, vs)
 
     print ("triangles: " + str(len(ts)) + "   vertices: " + str(len(vs)))
 
