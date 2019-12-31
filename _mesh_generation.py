@@ -4,8 +4,9 @@ from oneliners import *
 
 OUTPUT = 'ppout.obj'
 #SDF = lambda xyz : (xyz[0]**2 + xyz[1]**2 + xyz[2]**2) ** 0.5 - 0.5    # spere 0-0.5
-SDF = lambda xyz : (((xyz[0]**2 + xyz[1]**2)**0.5 - 1.) ** 2 + xyz[2]**2)**0.5 - 0.25    # thor R = 1, r = 0.25
-R3 = 97./56.
+#SDF = lambda xyz : (((xyz[0]**2 + xyz[1]**2)**0.5 - 1.) ** 2 + xyz[2]**2)**0.5 - 0.25    # thor R = 1, r = 0.25
+SDF = lambda xyz : ((xyz[0]**2 + xyz[1]**2)**0.5 - 1.) ** 2 + xyz[2]**2 - 0.25**2    # thor R = 1, r = 0.25 only in non-eqclidean SDF
+#R3 = 97./56.
 
 # three axes
 #a1 = [R3, 1., 0]
@@ -24,6 +25,8 @@ def grad(f, xyz):
 def snap(f, xyz):
     return sum_of(xyz, scaled(normalized(grad(f, xyz)), -f(xyz)))
 
+def snap3(f, xyz):
+    return snap(f, snap(f, snap(f, xyz)))
 
 def triangulate(sdf, p0, scale, subdivisions, ts, vs):
     if subdivisions > 0:
@@ -70,10 +73,10 @@ def triangulate(sdf, p0, scale, subdivisions, ts, vs):
                 for i in range(4):
                     for j in range(4):
                         tsi = len(vs)
-                        vs += [snap(sdf, xyz(i,j, quad))]
-                        vs += [snap(sdf, xyz(i,j+1, quad))]
-                        vs += [snap(sdf, xyz(i+1,j, quad))]
-                        vs += [snap(sdf, xyz(i+1,j+1, quad))]
+                        vs += [snap3(sdf, xyz(i,j, quad))]
+                        vs += [snap3(sdf, xyz(i,j+1, quad))]
+                        vs += [snap3(sdf, xyz(i+1,j, quad))]
+                        vs += [snap3(sdf, xyz(i+1,j+1, quad))]
                         ts += [[tsi, tsi+1, tsi+2]]
                         ts += [[tsi+2, tsi+1, tsi+3]]
 
