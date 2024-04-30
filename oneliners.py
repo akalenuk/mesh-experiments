@@ -49,6 +49,9 @@ def inverted(A):
 def centroid_of(Ps):
 	return [sum(xi) / len(Ps) for xi in transposed(Ps)]
 
+def float_range(start, finish, step):
+	return [] if start > finish else [start] + float_range(start + step, finish, step)
+
 if __name__ == "__main__":
 	A = [[0.78, -0.42, 0.59], [0.95, 0.31, 0.26], [-0.44, -0.1, -0.38]]
 	B = [1.0, 2.0, 3.0]

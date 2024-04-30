@@ -2,8 +2,6 @@ import time
 import obj_io
 from oneliners import *
 
-import numpy as np
-
 
 def grad(f, xyz):
     EPS = 1.e-5;
@@ -20,9 +18,9 @@ def triangulate(bbox_min, bbox_max, cube_size, distance_in_point):
     ts = []
     
     # 1. create square walls
-    for z in np.arange(bbox_min[2], bbox_max[2], cube_size):
-      for y in np.arange(bbox_min[1], bbox_max[1], cube_size):
-        for x in np.arange(bbox_min[0], bbox_max[0], cube_size):
+    for z in float_range(bbox_min[2], bbox_max[2], cube_size):
+      for y in float_range(bbox_min[1], bbox_max[1], cube_size):
+        for x in float_range(bbox_min[0], bbox_max[0], cube_size):
           # detect border, create walls
           cube_center = (x + cube_size / 2., y + cube_size / 2., z + cube_size / 2.)
           neighbor100 = (x - cube_size / 2., y + cube_size / 2., z + cube_size / 2.)
