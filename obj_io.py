@@ -39,10 +39,10 @@ def str_from_faces(faces):
 if __name__ == "__main__":
 	f = open('ellipsoid.obj', 'r')
 	for vs in vertexes(f.read()):
-		print 'v', vs
+		print ('v', vs)
 	f.close()
 	f = open('ellipsoid.obj', 'r')
 	for tr in triangles(f.read()):
-		print 'tr', tr
+		print ('tr', tr)
 	f.close()
 

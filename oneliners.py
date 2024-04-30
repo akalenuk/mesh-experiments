@@ -52,17 +52,17 @@ def centroid_of(Ps):
 if __name__ == "__main__":
 	A = [[0.78, -0.42, 0.59], [0.95, 0.31, 0.26], [-0.44, -0.1, -0.38]]
 	B = [1.0, 2.0, 3.0]
-	print 'A, B:', A, B
+	print ('A, B:', A, iB)
 	X = solution_for(A, B)
 	err = distance_between(multiplication_of(A, X), B)
-	print 'X, error:', X, err
+	print ('X, error:', X, err)
 	Ai = inverted(A)
-	print 'A^-1:', Ai
+	print ('A^-1:', Ai)
 	Aii = inverted(Ai)
-	print '(A^-1)^-1:',Aii
-	print B
+	print ('(A^-1)^-1:',Aii)
+	print (B)
 	X = multiplication_of(Ai, B)
 	err = distance_between(multiplication_of(A, X), B)
-	print 'Ai*B, error:', X, err
+	print ('Ai*B, error:', X, err)
 	points = [[1., 2., 3.], [2., 4., 6.], [3., 6., 9.]]
-	print 'Centroid of', points, '=', centroid_of(points)
+	print ('Centroid of', points, '=', centroid_of(points))
