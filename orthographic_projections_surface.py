@@ -4,7 +4,7 @@ from sympy import *
 
 xs = [-0.9, +0.7, +0.8]
 ys = [-0.1, +0.8, -0.6]
-zs = [-0.2, +0.0, +0.3]
+zs = [-0.6, +0.0, +0.9]
 
 #{ax: (y1 - y2)/(x1*y2 - x2*y1), ay: (-x1 + x2)/(x1*y2 - x2*y1)}
 
@@ -92,9 +92,9 @@ az3_x = eqs[az3_x]
 
 # surface equations
 eqs = solve(
-[(ax1_z*x + ay1_z*y + 1)*(ax2_z*x + ay2_z*y + 1)*(ax3_z*x + ay3_z*y + 1) - a,
- (ax1_y*x + 1 + az1_y*z)*(ax2_y*x + 1 + az2_y*z)*(ax3_y*x + 1 + az3_y*z) - b,
- (1 + ay1_x*x + az1_x*z)*(1 + ay2_x*x + az2_x*z)*(1 + ay3_x*x + az3_x*z) - c
+[(ax1_z*x + ay1_z*y + 1)*(ax2_z*x + ay2_z*y + 1)*(ax3_z*x + ay3_z*y + 1) + 0.1 - a,
+ (ax1_y*x + 1 + az1_y*z)*(ax2_y*x + 1 + az2_y*z)*(ax3_y*x + 1 + az3_y*z) + 0.1 - b,
+ (1 + ay1_x*x + az1_x*z)*(1 + ay2_x*x + az2_x*z)*(1 + ay3_x*x + az3_x*z) + 0.1 - c
 ], (a, b, c))
 
 a = eqs[a]
@@ -102,7 +102,7 @@ b = eqs[b]
 c = eqs[c]
 
 _a = a.subs([(x1, xs[0]), (x2, xs[1]), (x3, xs[2]), (y1, ys[0]), (y2, ys[1]), (y3, ys[2]), (z1, zs[0]), (z2, zs[1]), (z3, zs[2])])
-_b = a.subs([(x1, xs[0]), (x2, xs[1]), (x3, xs[2]), (y1, ys[0]), (y2, ys[1]), (y3, ys[2]), (z1, zs[0]), (z2, zs[1]), (z3, zs[2])])
+_b = b.subs([(x1, xs[0]), (x2, xs[1]), (x3, xs[2]), (y1, ys[0]), (y2, ys[1]), (y3, ys[2]), (z1, zs[0]), (z2, zs[1]), (z3, zs[2])])
 _c = c.subs([(x1, xs[0]), (x2, xs[1]), (x3, xs[2]), (y1, ys[0]), (y2, ys[1]), (y3, ys[2]), (z1, zs[0]), (z2, zs[1]), (z3, zs[2])])
 
 
@@ -110,11 +110,13 @@ def SDF(xyz):
     fa = _a.subs([(x, xyz[0]), (y, xyz[1]), (z, xyz[2])]).evalf()
     fb = _b.subs([(x, xyz[0]), (y, xyz[1]), (z, xyz[2])]).evalf()
     fc = _c.subs([(x, xyz[0]), (y, xyz[1]), (z, xyz[2])]).evalf()
-    return fa*fb*fc
-
+    return fa+fb+fc
 
 OUTPUT = '_ortographic_projections_surface.obj'
 (vs, ts) = triangulate([-1.1, -1.1, -1.1], [+1.1, +1.1, +1.1], 0.1, SDF)
+vsi = len(vs)
+vs += [[xs[0], ys[0], zs[0]], [xs[1], ys[1], zs[1]], [xs[2], ys[2], zs[2]]]
+ts += [[vsi, vsi+1, vsi+2]]
 
 print ("triangles: " + str(len(ts)) + "   vertices: " + str(len(vs)))
 

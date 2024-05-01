@@ -65,7 +65,7 @@ def triangulate(bbox_min, bbox_max, cube_size, distance_in_point):
               ts+=[(start_index, start_index + 3, start_index + 2)]
               
     # 2 crawl the vertices closer to the SDF
-    for j in range(4):
+    for j in range(2):
         for i in range(len(vs)):
             #print(i, len(vs))
             new_vsi = sum_of(vs[i], [cube_size / 4., 0., 0.])
