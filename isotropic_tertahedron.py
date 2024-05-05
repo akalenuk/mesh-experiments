@@ -135,19 +135,19 @@ def plane_in(x, xi, y, yi, z, zi, plane):
 
 def SDF(xyz):
 	x = xyz[0]
-	xi = 1
+	xi = 0
 	y = xyz[1]
-	yi = 1
+	yi = 0
 	z = xyz[2]
-	zi = 1
-	return (plane_in(x, xi, y, yi, z, zi, plane1)-0.1)  \
-	     * (plane_in(x, xi, y, yi, z, zi, plane2)-0.1) \
-	     * (plane_in(x, xi, y, yi, z, zi, plane3)-0.1) \
-	     * (plane_in(x, xi, y, yi, z, zi, plane4)-0.1)
+	zi = 0
+	return (plane_in(x, xi, y, yi, z, zi, plane1))  \
+	     * (plane_in(x, xi, y, yi, z, zi, plane2)) \
+	     * (plane_in(x, xi, y, yi, z, zi, plane3)) \
+	     * (plane_in(x, xi, y, yi, z, zi, plane4)) + 0.5
 
 
 OUTPUT = '_isotropic_tetrahedron_surface.obj'
-(vs, ts) = triangulate([-1.1, -1.1, -1.1], [+1.1, +1.1, +1.1], 0.05, SDF)
+(vs, ts) = triangulate([-5.1, -5.1, -5.1], [+5.1, +5.1, +5.1], 0.1, SDF)
 
 vsi = len(vs)
 vs += [ps[0], ps[1], ps[2], ps[3]]
